@@ -1,939 +1,141 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" class="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Open Component Lens — AI Lab & Inventory Assistant</title>
-  
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "Open Component Lens",
-    "operatingSystem": "Web, iOS, Android, Windows, macOS",
-    "applicationCategory": "DeveloperApplication",
-    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-    "description": "Serverless electronic component inventory, project tracker, and Gemini AI lab assistant featuring client-side AES-256 encryption."
-  }
-  </script>
-
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-  <style>
-    .glass-panel { background: rgba(15, 23, 42, 0.80); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
-    .glass-card { background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.06); }
-    .grid-bg { background-image: radial-gradient(rgba(59, 130, 246, 0.15) 1px, transparent 1px); background-size: 32px 32px; }
-  </style>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark"><title>Open Component Lens v3.2 Pro</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{color-scheme:dark}body{background:#070d19;color:#e5edf8}.grid-bg{background-image:radial-gradient(#24334d 1px,transparent 1px);background-size:28px 28px}.panel{background:rgba(15,23,42,.91);border:1px solid #25334a;box-shadow:0 12px 32px #02061730}.card{background:linear-gradient(145deg,#152239,#0e1728);border:1px solid #26354c}.field{width:100%;background:#081222;border:1px solid #334155;border-radius:.7rem;padding:.7rem .85rem;color:#f8fafc;outline:none}.field:focus{border-color:#60a5fa;box-shadow:0 0 0 3px #3b82f622}.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;border-radius:.7rem;padding:.65rem .9rem;font-weight:600;font-size:.82rem;transition:.15s}.btn:disabled{opacity:.45;cursor:not-allowed}.primary{background:#2563eb;color:white}.primary:hover{background:#3b82f6}.secondary{background:#1e293b;border:1px solid #334155;color:#e2e8f0}.secondary:hover{background:#334155}.danger{background:#7f1d1d;color:#fee2e2}.danger:hover{background:#991b1b}.muted{color:#94a3b8}.badge{display:inline-flex;align-items:center;gap:.3rem;border:1px solid #334155;background:#0b1627;border-radius:999px;padding:.22rem .55rem;font-size:.7rem}.hide{display:none!important}.modal-backdrop{position:fixed;inset:0;z-index:70;background:#020617d9;backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:1rem}.modal{width:min(100%,680px);max-height:92vh;overflow:auto;background:#0e1728;border:1px solid #334155;border-radius:1rem;box-shadow:0 24px 80px #0009}.toast{position:fixed;right:1rem;bottom:1rem;z-index:100;max-width:min(92vw,420px);padding:.9rem 1rem;border:1px solid #334155;border-radius:.8rem;background:#111d30;box-shadow:0 10px 40px #0007}.scanner-frame:after{content:'';position:absolute;left:8%;right:8%;height:2px;top:15%;background:#60a5fa;box-shadow:0 0 18px #3b82f6;animation:scan 2.2s ease-in-out infinite alternate}.scanner-frame{position:relative;overflow:hidden}@keyframes scan{from{top:12%}to{top:86%}}.focus-ring:focus-visible{outline:2px solid #60a5fa;outline-offset:3px}img{color:#64748b} @media(max-width:640px){.metric-num{font-size:1.35rem}.modal-backdrop{padding:.5rem;align-items:flex-end}.modal{max-height:94vh;border-radius:1rem 1rem .6rem .6rem}}
+</style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen grid-bg font-sans antialiased selection:bg-blue-500 selection:text-white text-sm">
-
-  <!-- Header Navigation -->
-  <header class="sticky top-0 z-40 glass-panel border-b border-slate-800 px-6 py-4">
-    <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
-      <div class="flex items-center gap-3.5">
-        <div class="p-3 bg-gradient-to-br from-blue-600/30 to-indigo-600/30 text-blue-400 rounded-xl border border-blue-500/30">
-          <i class="fa-solid fa-microchip text-xl"></i>
-        </div>
-        <div>
-          <h1 class="font-bold text-base text-white tracking-wide flex items-center gap-2">
-            Open Component Lens
-            <span class="text-[11px] uppercase font-mono px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">v3.1 Pro</span>
-          </h1>
-          <p class="text-xs text-slate-400">Encrypted AI Lab & Inventory Hub</p>
-        </div>
-      </div>
-
-      <div class="flex items-center bg-slate-900/90 border border-slate-800 rounded-xl p-1.5 gap-1.5">
-        <button onclick="switchTab('inventory')" id="tabBtnInventory" class="px-5 py-2 rounded-lg text-xs font-semibold transition bg-blue-600 text-white shadow">
-          <i class="fa-solid fa-boxes-stacked mr-1.5"></i> Inventory
-        </button>
-        <button onclick="switchTab('projects')" id="tabBtnProjects" class="px-5 py-2 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white">
-          <i class="fa-solid fa-diagram-project mr-1.5"></i> Projects & Playground
-        </button>
-      </div>
-
-      <div class="flex items-center gap-3.5">
-        <div id="syncStatus" class="hidden md:flex items-center gap-2 text-xs text-emerald-400 bg-emerald-950/60 border border-emerald-500/30 px-4 py-2 rounded-full">
-          <i class="fa-solid fa-rotate text-xs" id="syncSpinner"></i>
-          <span id="syncText" class="font-medium">Cloud Synced</span>
-        </div>
-        <button onclick="openScannerModal()" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-4.5 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2 transition shadow-lg shadow-blue-600/20">
-          <i class="fa-solid fa-camera"></i> Scan Part
-        </button>
-        <button onclick="promptForUnlock()" class="bg-slate-800/80 hover:bg-slate-700 text-slate-300 p-2.5 rounded-xl text-sm border border-slate-700 transition" title="Security Settings">
-          <i class="fa-solid fa-shield-halved text-amber-400 text-base"></i>
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <!-- Main Container -->
-  <main class="max-w-7xl mx-auto p-4 md:p-8 space-y-8">
-
-    <!-- VIEW 1: INVENTORY & DASHBOARD -->
-    <section id="viewInventory" class="space-y-6">
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
-        <div class="glass-panel p-5 rounded-2xl border border-slate-800 flex items-center gap-4">
-          <div class="p-3.5 bg-blue-500/10 text-blue-400 rounded-xl"><i class="fa-solid fa-microchip text-xl"></i></div>
-          <div>
-            <div class="text-xs text-slate-400 font-medium uppercase tracking-wider">Total Parts</div>
-            <div id="metricTotalParts" class="text-2xl font-bold text-white font-mono mt-0.5">0</div>
-          </div>
-        </div>
-        <div class="glass-panel p-5 rounded-2xl border border-slate-800 flex items-center gap-4">
-          <div class="p-3.5 bg-amber-500/10 text-amber-400 rounded-xl"><i class="fa-solid fa-triangle-exclamation text-xl"></i></div>
-          <div>
-            <div class="text-xs text-slate-400 font-medium uppercase tracking-wider">Low Stock / Shortage</div>
-            <div id="metricLowStock" class="text-2xl font-bold text-amber-400 font-mono mt-0.5">0</div>
-          </div>
-        </div>
-        <div class="glass-panel p-5 rounded-2xl border border-slate-800 flex items-center gap-4">
-          <div class="p-3.5 bg-purple-500/10 text-purple-400 rounded-xl"><i class="fa-solid fa-diagram-project text-xl"></i></div>
-          <div>
-            <div class="text-xs text-slate-400 font-medium uppercase tracking-wider">Active Builds</div>
-            <div id="metricActiveProjects" class="text-2xl font-bold text-white font-mono mt-0.5">0</div>
-          </div>
-        </div>
-        <div class="glass-panel p-5 rounded-2xl border border-slate-800 flex items-center gap-4">
-          <div class="p-3.5 bg-emerald-500/10 text-emerald-400 rounded-xl"><i class="fa-solid fa-cloud-arrow-down text-xl"></i></div>
-          <div>
-            <div class="text-xs text-slate-400 font-medium uppercase tracking-wider">Cloud Status</div>
-            <div id="metricCloudStatus" class="text-sm font-bold text-emerald-400 mt-1">Connected</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="glass-panel p-5 rounded-2xl flex flex-wrap items-center justify-between gap-4">
-        <div class="flex-1 min-w-[280px]">
-          <div class="relative">
-            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-            <input type="text" id="searchInput" oninput="renderInventory()" placeholder="Search components, IC numbers, categories..." class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl pl-11 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
-          </div>
-        </div>
-        <div class="flex items-center gap-3">
-          <select id="categoryFilter" onchange="renderInventory()" class="bg-slate-900/90 border border-slate-700/80 text-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none">
-            <option value="All">All Categories</option>
-            <option value="Power">Power / Regulators</option>
-            <option value="Microcontrollers">Microcontrollers</option>
-            <option value="Passive">Passives (Res/Cap/Ind)</option>
-            <option value="Sensors">Sensors & Modules</option>
-            <option value="Discrete">Discrete Semiconductors</option>
-          </select>
-          <button onclick="fetchFromCloud()" class="bg-slate-900/90 hover:bg-slate-800 text-slate-300 p-3 rounded-xl text-sm border border-slate-700 transition" title="Force Sync">
-            <i class="fa-solid fa-arrows-rotate"></i>
-          </button>
-        </div>
-      </div>
-
-      <div id="componentGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
-    </section>
-
-    <!-- VIEW 2: PROJECTS & ISOLATED PLAYGROUND -->
-    <section id="viewProjects" class="space-y-6 hidden">
-      <div class="flex flex-wrap justify-between items-center gap-4">
-        <div>
-          <h2 class="text-xl font-bold text-white">Lab Projects & Isolated Playground</h2>
-          <p class="text-xs text-slate-400 mt-0.5">Focus on one build at a time with automated stock shortage checks and Gemini AI assistant.</p>
-        </div>
-        <button onclick="openNewProjectModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2 shadow-lg">
-          <i class="fa-solid fa-plus"></i> New Project Build
-        </button>
-      </div>
-
-      <div id="projectsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
-
-      <!-- Isolated Playground Workspace -->
-      <div id="projectPlayground" class="glass-panel p-6 md:p-8 rounded-2xl border border-slate-800 hidden space-y-6">
-        <div class="flex flex-wrap justify-between items-center border-b border-slate-800 pb-5">
-          <div>
-            <span class="text-xs uppercase font-mono px-3 py-1 rounded-md bg-purple-500/20 text-purple-300 border border-purple-500/30 font-semibold">Active Playground</span>
-            <h3 id="pgTitle" class="text-2xl font-bold text-white mt-2">Project Name</h3>
-            <p id="pgDesc" class="text-sm text-slate-300 mt-1">Project description...</p>
-          </div>
-          <button onclick="closePlayground()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded-xl text-xs font-semibold">
-            <i class="fa-solid fa-arrow-left mr-1.5"></i> Back to Projects
-          </button>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <!-- Required Components Column with Bigger, Clear Cards -->
-          <div class="space-y-4">
-            <div class="flex justify-between items-center">
-              <h4 class="text-sm font-bold text-slate-200 uppercase tracking-wider">Required Components</h4>
-              <button onclick="openBindComponentModal()" class="text-xs text-blue-400 hover:text-blue-300 font-semibold">+ Link Part</button>
-            </div>
-            <div id="pgRequiredParts" class="space-y-3"></div>
-          </div>
-
-          <!-- Build Checklist -->
-          <div class="space-y-4">
-            <div class="flex justify-between items-center">
-              <h4 class="text-sm font-bold text-slate-200 uppercase tracking-wider">Build Checklist</h4>
-              <button onclick="addProjectTodo()" class="text-xs text-emerald-400 hover:text-emerald-300 font-semibold">+ Add Task</button>
-            </div>
-            <div id="pgTodoList" class="space-y-2.5"></div>
-          </div>
-
-          <!-- Gemini AI Lab Coach -->
-          <div class="glass-card p-5 rounded-2xl border border-purple-500/30 flex flex-col justify-between space-y-4 shadow-xl">
-            <div>
-              <div class="flex items-center gap-2 text-purple-300 font-bold text-sm mb-1.5">
-                <i class="fa-solid fa-wand-magic-sparkles"></i> Gemini AI Lab Coach
-              </div>
-              <p class="text-xs text-slate-300 leading-relaxed">Ask for schematic troubleshooting, wiring suggestions, or code snippets for this build.</p>
-            </div>
-            <div id="aiChatResponse" class="bg-slate-950/90 p-3.5 rounded-xl text-xs text-slate-200 font-mono min-h-[140px] max-h-[220px] overflow-y-auto border border-slate-800 leading-relaxed">
-              AI Coach ready. Ask a question regarding your component stock or build steps below.
-            </div>
-            <div class="flex gap-2.5">
-              <input type="text" id="aiPromptInput" placeholder="Ask AI coach..." class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-purple-500">
-              <button onclick="runAiLabCoach()" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-xl text-xs font-semibold shadow">Ask</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- Modals (Scanner, New Project, Bind, Settings) -->
-  <div id="scanModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="glass-panel max-w-2xl w-full rounded-2xl overflow-hidden border border-slate-700 flex flex-col max-h-[92vh] shadow-2xl">
-      <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-900/40">
-        <h3 class="font-semibold text-white flex items-center gap-2">
-          <i class="fa-solid fa-camera text-blue-400"></i> AI Lens Component Scanner
-        </h3>
-        <button onclick="closeScannerModal()" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
-      </div>
-      
-      <div class="p-6 overflow-y-auto space-y-5">
-        <div class="relative bg-slate-950 rounded-xl overflow-hidden aspect-video border border-slate-800 flex items-center justify-center shadow-inner">
-          <video id="webcamVideo" autoplay playsinline class="w-full h-full object-cover hidden"></video>
-          <canvas id="photoCanvas" class="hidden"></canvas>
-          <div id="cameraPlaceholder" class="text-center p-6 text-slate-500">
-            <i class="fa-solid fa-camera-retro text-4xl mb-3 text-slate-600"></i>
-            <p class="text-sm">Start webcam or upload component images for AI identification</p>
-          </div>
-        </div>
-
-        <div class="flex justify-center gap-3">
-          <button onclick="startCamera()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded-xl text-sm flex items-center gap-2 border border-slate-700">
-            <i class="fa-solid fa-video text-xs"></i> Camera
-          </button>
-          <button onclick="capturePhoto()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-sm flex items-center gap-2 shadow-md">
-            <i class="fa-solid fa-circle-dot text-xs"></i> Snap Photo
-          </button>
-          <label class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded-xl text-sm flex items-center gap-2 border border-slate-700 cursor-pointer">
-            <i class="fa-solid fa-upload text-xs"></i> Upload
-            <input type="file" accept="image/*" multiple onchange="handleFileUpload(event)" class="hidden">
-          </label>
-        </div>
-
-        <div id="imageQueue" class="flex gap-2.5 overflow-x-auto py-1"></div>
-
-        <div class="space-y-3.5 pt-4 border-t border-slate-800/80">
-          <div class="flex justify-between items-center">
-            <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Extracted Specs</span>
-            <button onclick="runGeminiAiExtraction()" class="text-xs bg-purple-600/90 hover:bg-purple-500 text-white border border-purple-400/30 px-3.5 py-1.5 rounded-full flex items-center gap-1.5 transition">
-              <i class="fa-solid fa-wand-magic-sparkles"></i> Run Gemini AI Lens
-            </button>
-          </div>
-          <div class="grid grid-cols-2 gap-3">
-            <input type="text" id="specTitle" placeholder="Component Title" class="bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white">
-            <input type="text" id="specLabel" placeholder="Part Number / IC Label" class="bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white">
-            <select id="specCategory" class="bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white">
-              <option value="Power">Power</option>
-              <option value="Microcontrollers">Microcontrollers</option>
-              <option value="Passive">Passive</option>
-              <option value="Sensors">Sensors</option>
-              <option value="Discrete">Discrete</option>
-            </select>
-            <div class="flex gap-2">
-              <input type="text" id="specMinV" placeholder="Min Volt (3.0V)" class="w-1/2 bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white">
-              <input type="text" id="specMaxV" placeholder="Max Volt (5.5V)" class="w-1/2 bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white">
-            </div>
-          </div>
-          <textarea id="specDesc" rows="2" placeholder="Datasheet Summary..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white"></textarea>
-        </div>
-      </div>
-
-      <div class="p-4 border-t border-slate-800 flex justify-end gap-3 bg-slate-900/60">
-        <button onclick="closeScannerModal()" class="px-4 py-2 rounded-xl text-sm text-slate-400 hover:text-white">Cancel</button>
-        <button onclick="saveComponent()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2 rounded-xl text-sm font-medium shadow-lg">Save Component</button>
-      </div>
-    </div>
+<body class="min-h-screen grid-bg text-sm antialiased">
+<header class="sticky top-0 z-40 border-b border-slate-800 bg-slate-950/95 backdrop-blur-xl">
+ <div class="max-w-7xl mx-auto px-4 md:px-7 py-3 flex flex-wrap items-center justify-between gap-3">
+  <div class="flex items-center gap-3"><div class="w-11 h-11 rounded-xl bg-blue-500/15 border border-blue-400/30 text-blue-300 grid place-items-center"><i class="fa-solid fa-microchip text-xl"></i></div><div><div class="font-bold text-white tracking-wide">Open Component Lens <span class="text-[10px] text-blue-300 border border-blue-500/30 bg-blue-500/10 rounded-full px-2 py-1">v3.2 Pro</span></div><div class="text-xs muted">Electronics inventory & project workspace</div></div></div>
+  <nav class="flex gap-1 rounded-xl border border-slate-800 bg-slate-900 p-1" aria-label="Main navigation"><button id="navInventory" class="btn primary" onclick="switchTab('inventory')"><i class="fa-solid fa-boxes-stacked"></i> Inventory</button><button id="navProjects" class="btn secondary" onclick="switchTab('projects')"><i class="fa-solid fa-diagram-project"></i> Projects</button></nav>
+  <div class="flex gap-2 items-center"><span id="syncPill" class="badge text-emerald-300"><i id="syncIcon" class="fa-solid fa-hard-drive"></i><span id="syncText">Local data</span></span><button class="btn primary" onclick="openScanner()"><i class="fa-solid fa-camera"></i><span class="hidden sm:inline">Scan Part</span><span class="sm:hidden">Scan</span></button><button class="btn secondary" title="Settings and security" onclick="unlockSettings()"><i class="fa-solid fa-gear"></i></button></div>
+ </div>
+</header>
+<main class="max-w-7xl mx-auto p-4 md:p-7 space-y-6">
+<section id="inventoryView" class="space-y-6">
+ <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
+  <div class="panel rounded-2xl p-4 md:p-5 flex gap-3 items-center"><div class="w-11 h-11 rounded-xl bg-blue-500/15 text-blue-300 grid place-items-center"><i class="fa-solid fa-microchip text-lg"></i></div><div><div class="text-xs uppercase tracking-wide muted">Component records</div><div id="metricRecords" class="metric-num text-2xl font-bold">0</div></div></div>
+  <div class="panel rounded-2xl p-4 md:p-5 flex gap-3 items-center"><div class="w-11 h-11 rounded-xl bg-cyan-500/15 text-cyan-300 grid place-items-center"><i class="fa-solid fa-boxes-stacked text-lg"></i></div><div><div class="text-xs uppercase tracking-wide muted">Physical units</div><div id="metricUnits" class="metric-num text-2xl font-bold">0</div></div></div>
+  <div class="panel rounded-2xl p-4 md:p-5 flex gap-3 items-center"><div class="w-11 h-11 rounded-xl bg-amber-500/15 text-amber-300 grid place-items-center"><i class="fa-solid fa-triangle-exclamation text-lg"></i></div><div><div class="text-xs uppercase tracking-wide muted">Low stock / shortage</div><div id="metricLow" class="metric-num text-2xl font-bold">0</div></div></div>
+  <div class="panel rounded-2xl p-4 md:p-5 flex gap-3 items-center"><div class="w-11 h-11 rounded-xl bg-purple-500/15 text-purple-300 grid place-items-center"><i class="fa-solid fa-diagram-project text-lg"></i></div><div><div class="text-xs uppercase tracking-wide muted">Active projects</div><div id="metricProjects" class="metric-num text-2xl font-bold">0</div></div></div>
+ </div>
+ <div class="panel rounded-2xl p-4 flex flex-col lg:flex-row gap-3 lg:items-center justify-between">
+  <div class="relative flex-1"><i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 muted"></i><input id="searchInput" class="field pl-11" placeholder="Search component name, part number, category…" oninput="renderInventory()" aria-label="Search inventory"></div>
+  <div class="flex flex-wrap gap-2"><select id="categoryFilter" class="field !w-auto min-w-40" onchange="renderInventory()"><option value="All">All categories</option><option>Power</option><option>Microcontrollers</option><option>Passive</option><option>Sensors</option><option>Discrete</option><option>Modules</option><option>Connectors</option><option>Tools</option><option>Other</option></select><select id="stockFilter" class="field !w-auto" onchange="renderInventory()"><option value="All">Any stock status</option><option value="low">Low stock</option><option value="out">Out of stock</option><option value="ok">In stock</option></select><button class="btn secondary" onclick="openComponentForm()"><i class="fa-solid fa-plus"></i> Add manually</button><button class="btn secondary" onclick="syncNow()" title="Synchronize now"><i class="fa-solid fa-rotate"></i></button></div>
+ </div>
+ <div class="flex items-center justify-between gap-3"><div><h2 class="text-lg font-bold">Inventory Vault</h2><p class="text-xs muted mt-1">Your parts, modules, boards, and lab supplies.</p></div><div class="text-xs muted" id="inventoryCount"></div></div>
+ <div id="componentGrid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+</section>
+<section id="projectsView" class="hide space-y-6">
+ <div class="flex flex-wrap justify-between items-start gap-3"><div><h2 class="text-xl font-bold">Projects & Playground</h2><p class="text-sm muted mt-1">Track requirements, stock gaps, and build tasks.</p></div><button class="btn primary" onclick="openProjectForm()"><i class="fa-solid fa-plus"></i> New project</button></div>
+ <div id="projectsGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+ <section id="projectWorkspace" class="hide panel rounded-2xl p-4 md:p-6 space-y-5">
+  <div class="flex flex-wrap justify-between items-start gap-3 border-b border-slate-800 pb-4"><div><span class="badge text-purple-300">Project workspace</span><h3 id="workspaceTitle" class="text-2xl font-bold mt-2"></h3><p id="workspaceDesc" class="muted mt-1"></p><div id="workspaceStatus" class="mt-3"></div></div><div class="flex gap-2 flex-wrap"><button class="btn secondary" onclick="openProjectForm(activeProjectId)"><i class="fa-solid fa-pen"></i> Edit</button><button class="btn secondary" onclick="closeWorkspace()"><i class="fa-solid fa-arrow-left"></i> All projects</button></div></div>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+   <div class="space-y-3"><div class="flex items-center justify-between"><h4 class="font-bold">Required components</h4><button class="text-blue-300 hover:text-blue-200 text-xs font-semibold" onclick="openRequirementForm()">+ Link part</button></div><div id="requiredParts" class="space-y-3"></div></div>
+   <div class="space-y-3"><div class="flex items-center justify-between"><h4 class="font-bold">Build checklist</h4><button class="text-emerald-300 hover:text-emerald-200 text-xs font-semibold" onclick="openTaskForm()">+ Add task</button></div><div id="todoList" class="space-y-2"></div></div>
+   <div class="card rounded-2xl p-4 flex flex-col gap-3"><div class="font-bold text-purple-200 flex items-center gap-2"><i class="fa-solid fa-wand-magic-sparkles"></i> Gemini AI Lab Coach</div><p class="text-xs muted">Ask about circuit design, troubleshooting, or your project’s parts. Stock figures shown here come from your app.</p><div id="aiChat" class="rounded-xl bg-slate-950/70 border border-slate-800 p-3 min-h-36 max-h-80 overflow-y-auto space-y-3" aria-live="polite"><p class="muted text-xs">Your project-aware assistant is ready when an AI key is configured.</p></div><form class="flex gap-2" onsubmit="askAi(event)"><input id="aiPrompt" class="field min-w-0" placeholder="Ask about this build…" autocomplete="off"><button class="btn primary" type="submit" aria-label="Ask AI"><i class="fa-solid fa-paper-plane"></i></button></form><p class="text-[11px] muted">Project details and inventory summaries may be sent to the configured AI provider.</p></div>
   </div>
-
-  <div id="newProjectModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="glass-panel max-w-md w-full rounded-2xl overflow-hidden border border-slate-700 p-6 space-y-4 shadow-2xl">
-      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-        <h3 class="font-semibold text-white text-base">Create New Project Build</h3>
-        <button onclick="closeNewProjectModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-      <div class="space-y-3.5">
-        <input type="text" id="newProjTitle" placeholder="Project Name (e.g., IoT Weather Station)" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white">
-        <textarea id="newProjDesc" rows="3" placeholder="Project objective & description..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white"></textarea>
-      </div>
-      <div class="flex justify-end gap-3 pt-2">
-        <button onclick="closeNewProjectModal()" class="px-4 py-2 rounded-xl text-sm text-slate-400">Cancel</button>
-        <button onclick="createProjectBuild()" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-xl text-sm font-medium">Create Project</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="bindModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="glass-panel max-w-sm w-full rounded-2xl overflow-hidden border border-slate-700 p-6 space-y-4 shadow-2xl">
-      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-        <h3 class="font-semibold text-white text-sm">Link Inventory Component</h3>
-        <button onclick="closeBindModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-      <div class="space-y-3.5">
-        <div>
-          <label class="text-xs text-slate-400 block mb-1">Select Component</label>
-          <select id="bindComponentSelect" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white"></select>
-        </div>
-        <div>
-          <label class="text-xs text-slate-400 block mb-1">Required Quantity</label>
-          <input type="number" id="bindQtyInput" value="1" min="1" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white">
-        </div>
-      </div>
-      <div class="flex justify-end gap-2 pt-2">
-        <button onclick="closeBindModal()" class="px-3.5 py-2 rounded-xl text-xs text-slate-400">Cancel</button>
-        <button onclick="confirmBindComponent()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-xs font-medium">Link Part</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Settings / Security Keys Modal -->
-  <div id="settingsModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="glass-panel max-w-md w-full rounded-2xl overflow-hidden border border-slate-700 p-6 space-y-4 shadow-2xl">
-      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-        <h3 class="font-semibold text-white flex items-center gap-2">
-          <i class="fa-solid fa-shield-halved text-amber-400"></i> Account Configuration & Keys
-        </h3>
-        <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-      <div class="space-y-4">
-        <div>
-          <label class="text-xs text-slate-400 block mb-1 font-medium">Master Security PIN</label>
-          <input type="password" id="appPinInput" placeholder="Master PIN..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white">
-        </div>
-
-        <div>
-          <div class="flex justify-between items-center mb-1">
-            <label class="text-xs text-slate-400 font-medium">Gemini API Key</label>
-            <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-[11px] text-blue-400 hover:text-blue-300 underline flex items-center gap-1">
-              Get Key <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
-            </a>
-          </div>
-          <input type="password" id="geminiKeyInput" placeholder="AI Studio Key..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white">
-        </div>
-
-        <div>
-          <label class="text-xs text-slate-400 block mb-1 font-medium">JSONBin Bin ID</label>
-          <input type="text" id="jsonbinIdInput" placeholder="Bin ID..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white">
-        </div>
-
-        <div>
-          <div class="flex justify-between items-center mb-1">
-            <label class="text-xs text-slate-400 font-medium">JSONBin Master Key ($2a$10...)</label>
-            <a href="https://jsonbin.io/" target="_blank" class="text-[11px] text-blue-400 hover:text-blue-300 underline flex items-center gap-1">
-              Get Keys <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
-            </a>
-          </div>
-          <input type="password" id="jsonbinMasterKeyInput" placeholder="Master API Key..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white">
-        </div>
-      </div>
-      <div class="flex justify-end gap-3 pt-2">
-        <button onclick="closeSettingsModal()" class="px-4 py-2 rounded-xl text-sm text-slate-400">Cancel</button>
-        <button onclick="saveSettings()" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-xl text-sm font-medium shadow-lg">Encrypt & Save</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const defaultStarterInventory = [
-      { id: "101", title: "ESP32-WROOM-32 WiFi/BLE Module", label: "ESP32", category: "Microcontrollers", minVolt: "3.0V", maxVolt: "3.6V", desc: "Dual-core Wi-Fi and Bluetooth microcontroller module for IoT applications.", qty: 5, image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=500&auto=format&fit=crop&q=60" },
-      { id: "102", title: "LM317 Adjustable Voltage Regulator", label: "LM317T", category: "Power", minVolt: "1.2V", maxVolt: "37V", desc: "Positive adjustable voltage regulator capable of supplying in excess of 1.5A.", qty: 8, image: "https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=500&auto=format&fit=crop&q=60" },
-      { id: "103", title: "ATmega328P Microcontroller", label: "ATMEGA328P", category: "Microcontrollers", minVolt: "1.8V", maxVolt: "5.5V", desc: "Low-power CMOS 8-bit microcontroller based on the AVR enhanced RISC architecture.", qty: 3, image: "https://images.unsplash.com/photo-1555680202-c86f0e12f086?w=500&auto=format&fit=crop&q=60" },
-      { id: "104", title: "100nF Ceramic Decoupling Capacitor", label: "104 CAP", category: "Passive", minVolt: "0V", maxVolt: "50V", desc: "Multilayer ceramic capacitor essential for high-frequency noise filtering on VCC pins.", qty: 45, image: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500&auto=format&fit=crop&q=60" }
-    ];
-
-    const defaultStarterProjects = [
-      {
-        id: "p1",
-        title: "IoT Weather Station",
-        desc: "Monitoring temperature, humidity, and barometric pressure via Wi-Fi telemetry.",
-        requiredParts: [{ partId: "101", needed: 1 }, { partId: "104", needed: 4 }],
-        todos: [{ text: "Solder I2C sensors to bus", done: true }, { text: "Flash ESP32 firmware", done: false }]
-      }
-    ];
-
-    let inventory = JSON.parse(localStorage.getItem('electrovault_items')) || defaultStarterInventory;
-    let projects = JSON.parse(localStorage.getItem('electrovault_projects')) || defaultStarterProjects;
-    
-    let currentImages = [];
-    let mediaStream = null;
-    let activePlaygroundId = null;
-
-    let activePin = '';
-    let geminiKey = '';
-    let jsonbinId = localStorage.getItem('user_jsonbin_id') || '';
-    let jsonbinMasterKey = localStorage.getItem('user_jsonbin_master') || '';
-
-    function hashPin(pin) { return CryptoJS.SHA256(pin).toString(); }
-    function encryptData(data, pin) { return CryptoJS.AES.encrypt(data, pin).toString(); }
-    function decryptData(ciphertext, pin) {
-      try {
-        const bytes = CryptoJS.AES.decrypt(ciphertext, pin);
-        return bytes.toString(CryptoJS.enc.Utf8);
-      } catch (e) { return ''; }
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      renderInventory();
-      renderProjects();
-      updateMetrics();
-      if (jsonbinId && jsonbinMasterKey) {
-        fetchFromCloud();
-      }
-    });
-
-    function switchTab(tab) {
-      if (tab === 'inventory') {
-        document.getElementById('viewInventory').classList.remove('hidden');
-        document.getElementById('viewProjects').classList.add('hidden');
-        document.getElementById('tabBtnInventory').className = "px-5 py-2 rounded-lg text-xs font-semibold transition bg-blue-600 text-white shadow";
-        document.getElementById('tabBtnProjects').className = "px-5 py-2 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white";
-      } else {
-        document.getElementById('viewInventory').classList.add('hidden');
-        document.getElementById('viewProjects').classList.remove('hidden');
-        document.getElementById('tabBtnProjects').className = "px-5 py-2 rounded-lg text-xs font-semibold transition bg-blue-600 text-white shadow";
-        document.getElementById('tabBtnInventory').className = "px-5 py-2 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white";
-        renderProjects();
-      }
-    }
-
-    async function fetchFromCloud() {
-      if (!jsonbinId || !jsonbinMasterKey) return;
-      const spinner = document.getElementById('syncSpinner');
-      const text = document.getElementById('syncText');
-      try {
-        if (spinner) spinner.classList.add('animate-spin');
-        if (text) text.innerText = "Syncing...";
-        const res = await fetch(`https://api.jsonbin.io/v3/b/${jsonbinId}/latest`, {
-          headers: { 'X-Master-Key': jsonbinMasterKey }
-        });
-        if (!res.ok) throw new Error("Fetch failed");
-        const data = await res.json();
-        const record = data.record || {};
-        if (record.items) inventory = record.items;
-        if (record.projects) projects = record.projects;
-        
-        saveLocal();
-        renderInventory();
-        renderProjects();
-        if (text) text.innerText = "Cloud Synced";
-        document.getElementById('metricCloudStatus').innerText = "Connected";
-      } catch (err) {
-        if (text) text.innerText = "Sync Offline";
-        document.getElementById('metricCloudStatus').innerText = "Offline Mode";
-      } finally {
-        if (spinner) spinner.classList.remove('animate-spin');
-      }
-    }
-
-    async function saveToCloud() {
-      saveLocal();
-      if (!jsonbinId || !jsonbinMasterKey) return;
-      const text = document.getElementById('syncText');
-      try {
-        if (text) text.innerText = "Saving...";
-        await fetch(`https://api.jsonbin.io/v3/b/${jsonbinId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Master-Key': jsonbinMasterKey
-          },
-          body: JSON.stringify({
-            updatedAt: Date.now(),
-            items: inventory,
-            projects: projects
-          })
-        });
-        if (text) text.innerText = "Cloud Updated";
-      } catch (err) {
-        if (text) text.innerText = "Save Failed";
-      }
-    }
-
-    function saveLocal() {
-      localStorage.setItem('electrovault_items', JSON.stringify(inventory));
-      localStorage.setItem('electrovault_projects', JSON.stringify(projects));
-      updateMetrics();
-    }
-
-    // Dynamic Low Stock Calculation (Checks Active Project Demands vs Available Qty)
-    function updateMetrics() {
-      document.getElementById('metricTotalParts').innerText = inventory.length;
-      document.getElementById('metricActiveProjects').innerText = projects.length;
-      
-      let shortageCount = 0;
-      inventory.forEach(item => {
-        let totalNeeded = 0;
-        projects.forEach(p => {
-          if (p.requiredParts) {
-            p.requiredParts.forEach(rp => {
-              if (rp.partId === item.id) totalNeeded += rp.needed;
-            });
-          }
-        });
-        if (item.qty < totalNeeded || item.qty < 2) {
-          shortageCount++;
-        }
-      });
-
-      document.getElementById('metricLowStock').innerText = shortageCount;
-    }
-
-    function renderInventory() {
-      const grid = document.getElementById('componentGrid');
-      const search = document.getElementById('searchInput').value.toLowerCase();
-      const cat = document.getElementById('categoryFilter').value;
-
-      const filtered = inventory.filter(item => {
-        const matchesSearch = item.title.toLowerCase().includes(search) || item.label.toLowerCase().includes(search);
-        const matchesCat = cat === 'All' || item.category === cat;
-        return matchesSearch && matchesCat;
-      });
-
-      if (filtered.length === 0) {
-        grid.innerHTML = `
-          <div class="col-span-full py-20 text-center text-slate-500">
-            <i class="fa-solid fa-box-open text-6xl mb-4 text-slate-600"></i>
-            <p class="text-base">No components found. Tap "Scan Part" to add to your vault!</p>
-          </div>`;
-        return;
-      }
-
-      grid.innerHTML = filtered.map(item => {
-        let totalNeeded = 0;
-        projects.forEach(p => {
-          if (p.requiredParts) {
-            p.requiredParts.forEach(rp => { if (rp.partId === item.id) totalNeeded += rp.needed; });
-          }
-        });
-        const hasShortage = item.qty < totalNeeded || item.qty < 2;
-        const usedInProjects = projects.filter(p => p.requiredParts && p.requiredParts.some(rp => rp.partId === item.id));
-        const projectBadges = usedInProjects.map(p => `<span class="text-xs bg-purple-500/20 text-purple-300 px-2.5 py-1 rounded-md border border-purple-500/30">🔗 ${p.title}</span>`).join(' ');
-
-        return `
-          <div class="glass-card rounded-2xl overflow-hidden hover:border-blue-500/50 transition-all duration-300 flex flex-col group shadow-xl">
-            <div class="h-48 bg-slate-950 relative overflow-hidden flex items-center justify-center">
-              <img src="${item.image}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-              <span class="absolute top-3 right-3 bg-slate-950/85 backdrop-blur-md px-3 py-1.5 rounded-lg text-xs text-blue-400 font-mono border border-slate-700/80">${item.minVolt} - ${item.maxVolt}</span>
-              <span class="absolute bottom-3 left-3 bg-blue-600/90 text-white px-3 py-1 rounded-md text-xs font-semibold">${item.category}</span>
-            </div>
-            <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
-              <div>
-                <div class="flex justify-between items-start">
-                  <span class="text-xs font-mono text-blue-400 uppercase tracking-wider font-semibold">${item.label}</span>
-                  ${hasShortage ? '<span class="text-xs bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded border border-amber-500/30 font-bold">Shortage / Low</span>' : ''}
-                </div>
-                <h4 class="font-bold text-white text-base leading-snug mt-1">${item.title}</h4>
-                <p class="text-xs text-slate-300 mt-1.5 line-clamp-2 leading-relaxed">${item.desc}</p>
-                <div class="flex flex-wrap gap-1.5 mt-3">${projectBadges}</div>
-              </div>
-              <div class="flex items-center justify-between border-t border-slate-800/80 pt-4">
-                <button onclick="deleteComponent('${item.id}')" class="text-sm text-red-400 hover:text-red-300 transition"><i class="fa-solid fa-trash-can"></i></button>
-                <div class="flex items-center gap-2.5 bg-slate-900 border border-slate-800 rounded-xl p-1.5">
-                  <button onclick="updateQty('${item.id}', -1)" class="w-7 h-7 rounded-lg bg-slate-800 text-slate-200 hover:bg-slate-700 flex items-center justify-center text-sm font-bold">-</button>
-                  <span class="font-mono text-sm text-white font-bold px-2">${item.qty}</span>
-                  <button onclick="updateQty('${item.id}', 1)" class="w-7 h-7 rounded-lg bg-slate-800 text-slate-200 hover:bg-slate-700 flex items-center justify-center text-sm font-bold">+</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function updateQty(id, delta) {
-      const item = inventory.find(i => i.id === id);
-      if (item) {
-        item.qty = Math.max(0, item.qty + delta);
-        saveToCloud();
-        renderInventory();
-        if (activePlaygroundId) openPlayground(activePlaygroundId);
-      }
-    }
-
-    function deleteComponent(id) {
-      if (confirm('Delete component from vault?')) {
-        inventory = inventory.filter(i => i.id !== id);
-        saveToCloud();
-        renderInventory();
-      }
-    }
-
-    function renderProjects() {
-      const grid = document.getElementById('projectsGrid');
-      if (projects.length === 0) {
-        grid.innerHTML = `<div class="col-span-full py-16 text-center text-slate-400 text-sm">No project builds active. Click "New Project Build" to start.</div>`;
-        return;
-      }
-
-      grid.innerHTML = projects.map(p => `
-        <div class="glass-panel p-6 rounded-2xl border border-slate-800 hover:border-blue-500/40 transition flex flex-col justify-between space-y-5 shadow-xl">
-          <div>
-            <div class="flex justify-between items-start">
-              <h3 class="font-bold text-white text-lg">${p.title}</h3>
-              <button onclick="deleteProject('${p.id}')" class="text-slate-400 hover:text-red-400 text-sm"><i class="fa-solid fa-trash"></i></button>
-            </div>
-            <p class="text-xs text-slate-300 mt-2 line-clamp-2 leading-relaxed">${p.desc}</p>
-          </div>
-          <div class="flex justify-between items-center pt-4 border-t border-slate-800">
-            <span class="text-xs text-slate-300 font-mono">${p.requiredParts ? p.requiredParts.length : 0} Linked Parts</span>
-            <button onclick="openPlayground('${p.id}')" class="bg-blue-600/20 hover:bg-blue-600 text-blue-300 hover:text-white px-4 py-2 rounded-xl text-xs font-semibold border border-blue-500/30 transition shadow">
-              Open Playground <i class="fa-solid fa-arrow-right ml-1"></i>
-            </button>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function openNewProjectModal() { document.getElementById('newProjectModal').classList.remove('hidden'); }
-    function closeNewProjectModal() { document.getElementById('newProjectModal').classList.add('hidden'); }
-
-    function createProjectBuild() {
-      const title = document.getElementById('newProjTitle').value.trim();
-      const desc = document.getElementById('newProjDesc').value.trim();
-      if (!title) { alert('Project title required'); return; }
-
-      projects.push({ id: 'p_' + Date.now(), title, desc, requiredParts: [], todos: [] });
-      saveToCloud();
-      closeNewProjectModal();
-      document.getElementById('newProjTitle').value = '';
-      document.getElementById('newProjDesc').value = '';
-      renderProjects();
-    }
-
-    function deleteProject(id) {
-      if (confirm('Delete project?')) {
-        projects = projects.filter(p => p.id !== id);
-        if (activePlaygroundId === id) closePlayground();
-        saveToCloud();
-        renderProjects();
-      }
-    }
-
-    // Larger, High-Visibility Component Cards in Playground
-    function openPlayground(id) {
-      activePlaygroundId = id;
-      const proj = projects.find(p => p.id === id);
-      if (!proj) return;
-
-      document.getElementById('projectsGrid').classList.add('hidden');
-      document.getElementById('projectPlayground').classList.remove('hidden');
-
-      document.getElementById('pgTitle').innerText = proj.title;
-      document.getElementById('pgDesc').innerText = proj.desc;
-
-      const partsContainer = document.getElementById('pgRequiredParts');
-      if (!proj.requiredParts || proj.requiredParts.length === 0) {
-        partsContainer.innerHTML = `<p class="text-xs text-slate-400">No components linked yet.</p>`;
-      } else {
-        partsContainer.innerHTML = proj.requiredParts.map(rp => {
-          const comp = inventory.find(i => i.id === rp.partId);
-          if (!comp) return '';
-          const hasEnough = comp.qty >= rp.needed;
-          return `
-            <div class="glass p-4 rounded-2xl flex items-center justify-between border ${hasEnough ? 'border-slate-800' : 'border-amber-500/60 bg-amber-950/30'} shadow-md gap-3">
-              <div class="flex items-center gap-3.5">
-                <img src="${comp.image}" class="w-14 h-14 rounded-xl object-cover border border-slate-700 flex-shrink-0">
-                <div>
-                  <div class="text-sm font-bold text-white leading-snug">${comp.title}</div>
-                  <div class="text-xs font-mono text-blue-400 mt-0.5">${comp.label}</div>
-                  <div class="text-xs font-semibold ${hasEnough ? 'text-emerald-400' : 'text-amber-400'} mt-1">Required: ${rp.needed} | Available: ${comp.qty} ${!hasEnough ? '⚠️ Shortage!' : ''}</div>
-                </div>
-              </div>
-              <button onclick="removePartFromProject('${proj.id}', '${rp.partId}')" class="text-slate-400 hover:text-red-400 text-sm p-2"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-          `;
-        }).join('');
-      }
-
-      const todoContainer = document.getElementById('pgTodoList');
-      if (!proj.todos || proj.todos.length === 0) {
-        todoContainer.innerHTML = `<p class="text-xs text-slate-400">No checklist items.</p>`;
-      } else {
-        todoContainer.innerHTML = proj.todos.map((t, idx) => `
-          <div class="flex items-center justify-between bg-slate-900/90 p-3 rounded-xl border border-slate-800 shadow-sm">
-            <label class="flex items-center gap-2.5 text-xs text-slate-200 cursor-pointer">
-              <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleProjectTodo('${proj.id}', ${idx})" class="w-4 h-4 rounded bg-slate-800 border-slate-700 text-blue-600">
-              <span class="${t.done ? 'line-through text-slate-500' : 'font-medium'}">${t.text}</span>
-            </label>
-            <button onclick="deleteProjectTodo('${proj.id}', ${idx})" class="text-slate-400 hover:text-red-400 text-xs p-1"><i class="fa-solid fa-trash"></i></button>
-          </div>
-        `).join('');
-      }
-    }
-
-    function closePlayground() {
-      activePlaygroundId = null;
-      document.getElementById('projectPlayground').classList.add('hidden');
-      document.getElementById('projectsGrid').classList.remove('hidden');
-      renderProjects();
-    }
-
-    function addProjectTodo() {
-      const text = prompt("Enter build task:");
-      if (!text) return;
-      const proj = projects.find(p => p.id === activePlaygroundId);
-      if (proj) {
-        if (!proj.todos) proj.todos = [];
-        proj.todos.push({ text, done: false });
-        saveToCloud();
-        openPlayground(proj.id);
-      }
-    }
-
-    function toggleProjectTodo(projId, idx) {
-      const proj = projects.find(p => p.id === projId);
-      if (proj && proj.todos[idx]) {
-        proj.todos[idx].done = !proj.todos[idx].done;
-        saveToCloud();
-      }
-    }
-
-    function deleteProjectTodo(projId, idx) {
-      const proj = projects.find(p => p.id === projId);
-      if (proj) {
-        proj.todos.splice(idx, 1);
-        saveToCloud();
-        openPlayground(projId);
-      }
-    }
-
-    function openBindComponentModal() {
-      const select = document.getElementById('bindComponentSelect');
-      select.innerHTML = inventory.map(i => `<option value="${i.id}">${i.title} (Stock: ${i.qty})</option>`).join('');
-      document.getElementById('bindModal').classList.remove('hidden');
-    }
-    function closeBindModal() { document.getElementById('bindModal').classList.add('hidden'); }
-
-    function confirmBindComponent() {
-      const partId = document.getElementById('bindComponentSelect').value;
-      const needed = parseInt(document.getElementById('bindQtyInput').value) || 1;
-      const proj = projects.find(p => p.id === activePlaygroundId);
-      if (proj) {
-        if (!proj.requiredParts) proj.requiredParts = [];
-        const existing = proj.requiredParts.find(rp => rp.partId === partId);
-        if (existing) { existing.needed += needed; } else { proj.requiredParts.push({ partId, needed }); }
-        saveToCloud();
-        closeBindModal();
-        openPlayground(proj.id);
-      }
-    }
-
-    function removePartFromProject(projId, partId) {
-      const proj = projects.find(p => p.id === projId);
-      if (proj) {
-        proj.requiredParts = proj.requiredParts.filter(rp => rp.partId !== partId);
-        saveToCloud();
-        openPlayground(projId);
-      }
-    }
-
-    async function runAiLabCoach() {
-      const promptText = document.getElementById('aiPromptInput').value.trim();
-      const chatBox = document.getElementById('aiChatResponse');
-      if (!promptText) return;
-      if (!geminiKey) { alert('Unlock your Gemini API key in Settings first.'); return; }
-
-      const proj = projects.find(p => p.id === activePlaygroundId);
-      const inventorySummary = inventory.map(i => `${i.title} (Qty: ${i.qty})`).join(', ');
-
-      chatBox.innerHTML += `<div class="text-blue-400 mt-2 font-semibold">You: ${promptText}</div>`;
-      document.getElementById('aiPromptInput').value = '';
-      chatBox.innerHTML += `<div class="text-slate-400 mt-1.5 italic animate-pulse">AI Lab Coach is analyzing stock and schematics...</div>`;
-      chatBox.scrollTop = chatBox.scrollHeight;
-
-      try {
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{
-              parts: [{
-                text: `You are an expert electronics lab engineer assisting a hardware builder in an isolated project playground.\nProject Name: ${proj.title}\nProject Description: ${proj.desc}\nAvailable Vault Inventory: [${inventorySummary}]\nUser Question: ${promptText}\nProvide clear, actionable engineering advice, wiring tips, or next steps.`
-              }]
-            }]
-          })
-        });
-
-        const data = await res.json();
-        const reply = data.candidates[0].content.parts[0].text;
-        chatBox.innerHTML = chatBox.innerHTML.replace(`<div class="text-slate-400 mt-1.5 italic animate-pulse">AI Lab Coach is analyzing stock and schematics...</div>`, '');
-        chatBox.innerHTML += `<div class="text-purple-300 mt-2.5 whitespace-pre-line bg-purple-950/40 p-3 rounded-xl border border-purple-500/30 leading-relaxed">AI: ${reply}</div>`;
-        chatBox.scrollTop = chatBox.scrollHeight;
-      } catch (err) {
-        chatBox.innerHTML += `<div class="text-red-400 mt-2">Error connecting to Gemini API: ${err.message}</div>`;
-      }
-    }
-
-    function openScannerModal() { document.getElementById('scanModal').classList.remove('hidden'); }
-    function closeScannerModal() { stopCamera(); document.getElementById('scanModal').classList.add('hidden'); currentImages = []; document.getElementById('imageQueue').innerHTML = ''; }
-
-    async function startCamera() {
-      try {
-        mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-        const video = document.getElementById('webcamVideo');
-        video.srcObject = mediaStream;
-        video.classList.remove('hidden');
-        document.getElementById('cameraPlaceholder').classList.add('hidden');
-      } catch (err) { alert('Camera access denied: ' + err.message); }
-    }
-
-    function stopCamera() {
-      if (mediaStream) { mediaStream.getTracks().forEach(t => t.stop()); mediaStream = null; }
-      document.getElementById('webcamVideo').classList.add('hidden');
-      document.getElementById('cameraPlaceholder').classList.remove('hidden');
-    }
-
-    function capturePhoto() {
-      const video = document.getElementById('webcamVideo');
-      if (!mediaStream) return;
-      const canvas = document.getElementById('photoCanvas');
-      canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-      canvas.getContext('2d').drawImage(video, 0, 0);
-      addImageToQueue(canvas.toDataURL('image/jpeg'));
-    }
-
-    function handleFileUpload(e) {
-      Array.from(e.target.files).forEach(file => {
-        const reader = new FileReader();
-        reader.onload = (event) => addImageToQueue(event.target.result);
-        reader.readAsDataURL(file);
-      });
-    }
-
-    function addImageToQueue(url) {
-      if (!url) return;
-      currentImages.push(url);
-      const queue = document.getElementById('imageQueue');
-      queue.innerHTML = currentImages.map((img, idx) => `
-        <div class="relative w-16 h-16 rounded-xl overflow-hidden border border-slate-700 flex-shrink-0 shadow-md">
-          <img src="${img}" class="w-full h-full object-cover">
-          <button onclick="removeImage(${idx})" class="absolute top-0 right-0 bg-red-600 text-white w-4 h-4 text-[10px] flex items-center justify-center font-bold">×</button>
-        </div>
-      `).join('');
-    }
-
-    function removeImage(idx) { currentImages.splice(idx, 1); addImageToQueue(''); }
-
-    async function runGeminiAiExtraction() {
-      if (currentImages.length === 0) { alert('Upload or capture an image first.'); return; }
-      if (!geminiKey) { alert('Unlock your Gemini key in Settings first.'); return; }
-
-      try {
-        const base64Data = currentImages[0].split(',')[1];
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{
-              parts: [
-                { text: "Analyze this electronic component. Identify part numbers, category (Power, Microcontrollers, Passive, Sensors, Discrete), voltage levels (minVolt, maxVolt), title, and brief description. Return strictly raw JSON with keys: title, label, category, minVolt, maxVolt, desc." },
-                { inline_data: { mime_type: "image/jpeg", data: base64Data } }
-              ]
-            }]
-          })
-        });
-
-        const data = await res.json();
-        const rawText = data.candidates[0].content.parts[0].text.replace(/```json|```/g, '').trim();
-        const parsed = JSON.parse(rawText);
-
-        document.getElementById('specTitle').value = parsed.title || '';
-        document.getElementById('specLabel').value = parsed.label || '';
-        document.getElementById('specCategory').value = parsed.category || 'Power';
-        document.getElementById('specMinV').value = parsed.minVolt || '0V';
-        document.getElementById('specMaxV').value = parsed.maxVolt || '5V';
-        document.getElementById('specDesc').value = parsed.desc || '';
-      } catch (err) { alert('AI Extraction Failed: ' + err.message); }
-    }
-
-    function saveComponent() {
-      const title = document.getElementById('specTitle').value || 'Unlabeled Component';
-      const label = document.getElementById('specLabel').value || 'GENERIC';
-      const category = document.getElementById('specCategory').value;
-      const minVolt = document.getElementById('specMinV').value || '0V';
-      const maxVolt = document.getElementById('specMaxV').value || '5V';
-      const desc = document.getElementById('specDesc').value || 'No description available.';
-      const image = currentImages[0] || 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=500&auto=format&fit=crop&q=60';
-
-      inventory.unshift({ id: 'item_' + Date.now(), title, label, category, minVolt, maxVolt, desc, qty: 1, image });
-      saveToCloud();
-      renderInventory();
-      closeScannerModal();
-    }
-
-    function promptForUnlock() {
-      const storedHash = localStorage.getItem('user_pin_hash');
-      if (!storedHash) {
-        const newPin = prompt("Set a Master PIN for your account keys:");
-        if (!newPin) return;
-        activePin = newPin;
-        localStorage.setItem('user_pin_hash', hashPin(activePin));
-        openSettingsModal();
-        return;
-      }
-
-      const inputPin = prompt("Enter Master PIN to unlock settings:");
-      if (!inputPin) return;
-
-      if (hashPin(inputPin) === storedHash) {
-        activePin = inputPin;
-        const encGemini = localStorage.getItem('enc_gemini_key') || '';
-        geminiKey = decryptData(encGemini, activePin);
-        openSettingsModal();
-      } else {
-        alert("Incorrect PIN! Access Denied.");
-      }
-    }
-
-    function openSettingsModal() {
-      document.getElementById('appPinInput').value = activePin;
-      document.getElementById('geminiKeyInput').value = geminiKey;
-      document.getElementById('jsonbinIdInput').value = jsonbinId;
-      document.getElementById('jsonbinMasterKeyInput').value = jsonbinMasterKey;
-      document.getElementById('settingsModal').classList.remove('hidden');
-    }
-
-    function closeSettingsModal() { document.getElementById('settingsModal').classList.add('hidden'); }
-
-    function saveSettings() {
-      const pin = document.getElementById('appPinInput').value.trim();
-      if (!pin) { alert("PIN required"); return; }
-      activePin = pin;
-      localStorage.setItem('user_pin_hash', hashPin(activePin));
-
-      geminiKey = document.getElementById('geminiKeyInput').value.trim();
-      jsonbinId = document.getElementById('jsonbinIdInput').value.trim();
-      jsonbinMasterKey = document.getElementById('jsonbinMasterKeyInput').value.trim();
-
-      localStorage.setItem('user_jsonbin_id', jsonbinId);
-      localStorage.setItem('user_jsonbin_master', jsonbinMasterKey);
-      localStorage.setItem('enc_gemini_key', encryptData(geminiKey, activePin));
-
-      closeSettingsModal();
-      if (jsonbinId && jsonbinMasterKey) {
-        document.getElementById('syncStatus').classList.remove('hidden');
-        fetchFromCloud();
-      }
-    }
-  </script>
-</body>
-</html>
+  <div class="flex flex-wrap gap-2 border-t border-slate-800 pt-4"><button class="btn secondary" onclick="setProjectStatus('Planning')">Planning</button><button class="btn secondary" onclick="setProjectStatus('In progress')">In progress</button><button class="btn secondary" onclick="setProjectStatus('Paused')">Paused</button><button class="btn secondary" onclick="setProjectStatus('Completed')">Mark completed</button><button class="btn secondary" onclick="archiveActiveProject()">Archive</button></div>
+ </section>
+</section>
+</main>
+<div id="modalRoot" class="hide"></div><div id="toastRoot" class="toast hide" role="status" aria-live="polite"></div>
+<script>
+'use strict';
+const KEYS={items:'electrovault_items',projects:'electrovault_projects',pinHash:'user_pin_hash',encGemini:'enc_gemini_key',binId:'user_jsonbin_id',binMaster:'user_jsonbin_master',lowThreshold:'ocl_low_stock_threshold'};
+const starterInventory=[
+{id:'101',title:'ESP32-WROOM-32 Wi-Fi/BLE Module',label:'ESP32',category:'Microcontrollers',minVolt:'3.0V',maxVolt:'3.6V',desc:'Dual-core Wi-Fi and Bluetooth microcontroller module for IoT applications.',qty:5,minQty:2,image:'https://images.unsplash.com/photo-1518770660439-4636190af475?w=700&auto=format&fit=crop&q=70'},
+{id:'102',title:'LM317 Adjustable Voltage Regulator',label:'LM317T',category:'Power',minVolt:'1.2V',maxVolt:'37V',desc:'Adjustable linear voltage regulator. Verify package and thermal requirements against its datasheet.',qty:8,minQty:2,image:''},
+{id:'103',title:'ATmega328P Microcontroller',label:'ATMEGA328P',category:'Microcontrollers',minVolt:'1.8V',maxVolt:'5.5V',desc:'8-bit AVR microcontroller. Operating range depends on clock frequency and device variant.',qty:3,minQty:2,image:''},
+{id:'104',title:'100 nF Ceramic Capacitor',label:'104 CAP',category:'Passive',minVolt:'—',maxVolt:'50V',desc:'Multilayer ceramic capacitor commonly used for local decoupling.',qty:45,minQty:10,image:''}];
+const starterProjects=[{id:'p1',title:'IoT Weather Station',desc:'Monitor temperature and humidity with Wi-Fi telemetry.',status:'In progress',requiredParts:[{partId:'101',needed:1},{partId:'104',needed:4}],todos:[{id:'t1',text:'Solder I²C sensors to the bus',done:true},{id:'t2',text:'Flash and test ESP32 firmware',done:false}]}];
+function readJSON(key,fallback){try{const v=JSON.parse(localStorage.getItem(key));return Array.isArray(v)?v:fallback}catch{return fallback}}
+let inventory=readJSON(KEYS.items,starterInventory).map(normalizeItem),projects=readJSON(KEYS.projects,starterProjects).map(normalizeProject);
+let activeProjectId=null,mediaStream=null,currentImages=[],geminiKey='',activePin='',binId=localStorage.getItem(KEYS.binId)||'',binMaster=localStorage.getItem(KEYS.binMaster)||'',syncing=false,saving=false,cloudReady=false,toastTimer=null,aiHistory=[];
+function normalizeItem(x){return {id:safeId(x.id,'item'),title:String(x.title??'Unnamed component'),label:String(x.label??''),category:String(x.category??'Other'),minVolt:String(x.minVolt??''),maxVolt:String(x.maxVolt??''),desc:String(x.desc??''),qty:Math.max(0,number(x.qty,0)),minQty:Math.max(0,number(x.minQty,number(localStorage.getItem(KEYS.lowThreshold),2))),image:String(x.image??''),location:String(x.location??''),manufacturer:String(x.manufacturer??''),partUrl:String(x.partUrl??''),notes:String(x.notes??'')}}
+function normalizeProject(p){return {id:safeId(p.id,'project'),title:String(p.title??'Untitled project'),desc:String(p.desc??''),status:String(p.status??'Planning'),requiredParts:Array.isArray(p.requiredParts)?p.requiredParts.map(r=>({partId:String(r.partId),needed:Math.max(1,number(r.needed,1))})):[],todos:Array.isArray(p.todos)?p.todos.map(t=>({id:safeId(t.id,'task'),text:String(t.text??''),done:!!t.done})):[]}}
+function number(v,d=0){const n=Number(v);return Number.isFinite(n)?n:d}function uid(prefix){return prefix+'_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8)}function safeId(v,prefix){const id=String(v??'').replace(/[^A-Za-z0-9_-]/g,'');return id||uid(prefix)}function safeHttpUrl(v){try{const u=new URL(String(v));return ['https:','http:'].includes(u.protocol)?u.href:''}catch{return ''}}
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function safeImage(url){return /^(https:\/\/|data:image\/(png|jpeg|webp|gif);base64,)/i.test(String(url||''))?String(url):''}
+function fallbackImage(){return 'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360"><rect width="100%" height="100%" fill="#101c30"/><g fill="none" stroke="#334d70" stroke-width="3"><rect x="240" y="100" width="160" height="150" rx="14"/><path d="M220 120h20m-20 30h20m-20 30h20m-20 30h20m160-90h20m-20 30h20m-20 30h20m-20 30h20M270 80v20m30-20v20m30-20v20m30-20v20M270 250v20m30-20v20m30-20v20m30-20v20"/></g><text x="320" y="180" fill="#8fb6ed" font-size="17" text-anchor="middle" font-family="sans-serif">COMPONENT</text></svg>')}
+function toast(msg,type='info'){const el=document.getElementById('toastRoot');el.className='toast';el.innerHTML=`<div class="flex gap-3 items-start"><i class="fa-solid ${type==='error'?'fa-circle-exclamation':type==='success'?'fa-circle-check':'fa-circle-info'} mt-0.5 ${type==='error'?'text-red-300':type==='success'?'text-emerald-300':'text-blue-300'}"></i><div>${esc(msg)}</div><button class="ml-auto muted" onclick="hideToast()" aria-label="Dismiss"><i class="fa-solid fa-xmark"></i></button></div>`;clearTimeout(toastTimer);toastTimer=setTimeout(hideToast,4500)}function hideToast(){document.getElementById('toastRoot').classList.add('hide')}
+function demandFor(itemId){return projects.reduce((sum,p)=>sum+p.requiredParts.reduce((s,r)=>s+(r.partId===itemId?number(r.needed):0),0),0)}
+function itemStatus(item){if(item.qty<=0)return 'out';if(item.qty<=item.minQty)return 'low';return 'ok'}
+function statusBadge(status){const map={out:'border-red-500/30 bg-red-500/10 text-red-300',low:'border-amber-500/30 bg-amber-500/10 text-amber-300',ok:'border-emerald-500/30 bg-emerald-500/10 text-emerald-300'};return `<span class="badge ${map[status]||''}">${status==='out'?'Out of stock':status==='low'?'Low stock':'In stock'}</span>`}
+function updateMetrics(){document.getElementById('metricRecords').textContent=inventory.length;document.getElementById('metricUnits').textContent=inventory.reduce((s,i)=>s+i.qty,0);document.getElementById('metricLow').textContent=inventory.filter(i=>itemStatus(i)!=='ok'||i.qty<demandFor(i.id)).length;document.getElementById('metricProjects').textContent=projects.filter(p=>!['Completed','Archived'].includes(p.status)).length}
+function saveLocal(){try{localStorage.setItem(KEYS.items,JSON.stringify(inventory));localStorage.setItem(KEYS.projects,JSON.stringify(projects));updateMetrics();setSyncState(binId&&binMaster?'Local saved · sync available':'Saved on this device','local');return true}catch(e){toast('Local save failed. Browser storage may be full; export your data before continuing.','error');setSyncState('Local save failed','error');return false}}
+function setSyncState(text,state='local'){document.getElementById('syncText').textContent=text;const pill=document.getElementById('syncPill');pill.className='badge '+(state==='error'?'text-red-300':state==='syncing'?'text-amber-300':state==='success'?'text-emerald-300':'text-slate-300');document.getElementById('syncIcon').className='fa-solid '+(state==='syncing'?'fa-rotate fa-spin':state==='error'?'fa-circle-exclamation':state==='success'?'fa-cloud-arrow-up':'fa-hard-drive')}
+async function syncNow(){if(syncing){toast('A sync is already running.');return}if(!binId||!binMaster){toast('Cloud sync is not configured. Your changes are saved locally.');openSettings();return}syncing=true;setSyncState('Syncing…','syncing');try{const res=await fetch(`https://api.jsonbin.io/v3/b/${encodeURIComponent(binId)}/latest`,{headers:{'X-Master-Key':binMaster},cache:'no-store'});if(!res.ok)throw new Error(`Cloud read failed (HTTP ${res.status}).`);const data=await res.json();const rec=data.record||{};if(!Array.isArray(rec.items)||!Array.isArray(rec.projects))throw new Error('The remote record does not contain valid items and projects arrays. No local data was replaced.');const remoteItems=rec.items.map(normalizeItem),remoteProjects=rec.projects.map(normalizeProject);const localSnapshot=JSON.stringify({items:inventory,projects}),remoteSnapshot=JSON.stringify({items:remoteItems,projects:remoteProjects});if(localSnapshot!==remoteSnapshot){const choice=await askChoice(`Local data has ${inventory.length} component records and ${projects.length} projects. Cloud data has ${remoteItems.length} component records and ${remoteProjects.length} projects. Choose which complete copy to keep; this app does not merge records automatically.`,'Resolve sync differences',['Load cloud data','Upload local data']);if(choice==='Upload local data'){cloudReady=true;await pushCloud();return}if(choice!=='Load cloud data'){setSyncState('Local saved · sync cancelled','local');return}}inventory=remoteItems;projects=remoteProjects;cloudReady=true;if(!saveLocal())throw new Error('Remote data loaded, but browser storage could not save it. Export immediately if the screen shows your data.');renderAll();setSyncState('Cloud synced','success');toast('Cloud data loaded successfully.','success')}catch(e){setSyncState('Sync failed · local data kept','error');toast(e.message||'Cloud sync failed. Local data was kept.','error')}finally{syncing=false}}
+async function pushCloud(){if(!binId||!binMaster){saveLocal();return}if(saving)return;saving=true;setSyncState('Uploading…','syncing');try{const payload={schemaVersion:2,updatedAt:Date.now(),items:inventory,projects};const res=await fetch(`https://api.jsonbin.io/v3/b/${encodeURIComponent(binId)}`,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':binMaster},body:JSON.stringify(payload)});if(!res.ok)throw new Error(`Cloud save failed (HTTP ${res.status}).`);cloudReady=true;setSyncState('Cloud saved','success')}catch(e){setSyncState('Local saved · cloud failed','error');toast(e.message+' Your local copy remains saved.','error')}finally{saving=false}}
+function commit(){try{localStorage.setItem('ocl_last_local_change',String(Date.now()))}catch{}const ok=saveLocal();renderAll();if(ok&&binId&&binMaster){if(cloudReady)pushCloud();else setSyncState('Local saved · sync pending','local')}}
+function renderAll(){renderInventory();renderProjects();updateMetrics()}
+function switchTab(tab){const inv=tab==='inventory';document.getElementById('inventoryView').classList.toggle('hide',!inv);document.getElementById('projectsView').classList.toggle('hide',inv);document.getElementById('navInventory').className='btn '+(inv?'primary':'secondary');document.getElementById('navProjects').className='btn '+(!inv?'primary':'secondary');if(!inv)renderProjects()}
+function renderInventory(){const grid=document.getElementById('componentGrid');const q=document.getElementById('searchInput').value.trim().toLowerCase();const cat=document.getElementById('categoryFilter').value,filter=document.getElementById('stockFilter').value;const rows=inventory.filter(i=>[i.title,i.label,i.category,i.desc,i.manufacturer,i.location].join(' ').toLowerCase().includes(q)&&(cat==='All'||i.category===cat)&&(filter==='All'||(filter==='low'?itemStatus(i)!=='ok'||i.qty<demandFor(i.id):filter==='out'?itemStatus(i)==='out':filter==='ok'?itemStatus(i)==='ok'&&i.qty>=demandFor(i.id):true)));document.getElementById('inventoryCount').textContent=`${rows.length} of ${inventory.length} records`;if(!rows.length){grid.innerHTML=`<div class="panel rounded-2xl p-10 text-center sm:col-span-2 xl:col-span-3"><i class="fa-solid fa-box-open text-4xl text-slate-600"></i><h3 class="font-bold mt-4">${inventory.length?'No matching components':'Your inventory is empty'}</h3><p class="muted text-sm mt-2">${inventory.length?'Try changing your search or filters.':'Add a component manually or use the scanner to start your vault.'}</p><div class="flex gap-2 justify-center mt-4"><button class="btn primary" onclick="openComponentForm()">Add component</button><button class="btn secondary" onclick="openScanner()">Scan a part</button></div></div>`;updateMetrics();return}
+ grid.innerHTML=rows.map(i=>{const st=itemStatus(i),demand=demandFor(i.id),short=demand>i.qty;return `<article class="card rounded-2xl overflow-hidden flex flex-col min-w-0"><button class="relative h-44 bg-slate-950/70 overflow-hidden text-left" onclick="showDetails('${esc(i.id)}')" aria-label="View ${esc(i.title)} details"><img src="${esc(safeImage(i.image)||fallbackImage())}" alt="${esc(i.title)}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='${fallbackImage()}'"><span class="absolute top-3 left-3 badge">${esc(i.category)}</span><span class="absolute top-3 right-3 badge">${esc(i.minVolt||'—')} – ${esc(i.maxVolt||'—')}</span></button><div class="p-4 flex flex-col gap-3 flex-1"><div class="flex items-start justify-between gap-2"><div class="min-w-0"><p class="text-xs text-blue-300 font-mono break-all">${esc(i.label||'No part number')}</p><button class="text-left font-bold text-white hover:text-blue-200 mt-1 leading-snug" onclick="showDetails('${esc(i.id)}')">${esc(i.title)}</button></div>${statusBadge(st)}</div><p class="text-xs muted leading-relaxed line-clamp-2">${esc(i.desc||'No description added.')}</p><div class="grid grid-cols-3 gap-2 rounded-xl bg-slate-950/50 p-3"><div><p class="text-[10px] muted uppercase">Owned</p><p class="font-bold text-lg">${i.qty}</p></div><div><p class="text-[10px] muted uppercase">Planned</p><p class="font-bold text-lg">${demand}</p></div><div><p class="text-[10px] muted uppercase">After plan*</p><p class="font-bold text-lg ${short?'text-amber-300':''}">${i.qty-demand}</p></div></div>${short?`<p class="text-xs text-amber-300"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Project demand exceeds stock by ${demand-i.qty}. Planned demand is not a reservation.</p>`:''}<div class="mt-auto flex items-center justify-between gap-2 border-t border-slate-800 pt-3"><div class="flex items-center gap-1"><button class="btn secondary !p-2" onclick="adjustQty('${esc(i.id)}',-1)" aria-label="Decrease quantity">−</button><button class="btn secondary !p-2" onclick="adjustQty('${esc(i.id)}',1)" aria-label="Increase quantity">+</button><span class="text-xs muted ml-1">Stock</span></div><div class="flex gap-1"><button class="btn secondary !p-2" onclick="openComponentForm('${esc(i.id)}')" title="Edit"><i class="fa-solid fa-pen"></i></button><button class="btn secondary !p-2" onclick="showDetails('${esc(i.id)}')" title="Details"><i class="fa-solid fa-arrow-up-right-from-square"></i></button><button class="btn secondary !p-2" onclick="deleteComponent('${esc(i.id)}')" title="Archive or delete"><i class="fa-solid fa-ellipsis"></i></button></div></div></div></article>`}).join('');updateMetrics()}
+function renderProjects(){const grid=document.getElementById('projectsGrid');const active=projects.filter(p=>p.status!=='Archived');if(!active.length){grid.innerHTML=`<div class="panel rounded-2xl p-10 text-center md:col-span-2 xl:col-span-3"><i class="fa-solid fa-diagram-project text-4xl text-slate-600"></i><h3 class="font-bold mt-4">No projects yet</h3><p class="muted mt-2">Create a project and link the parts you expect to use.</p><button class="btn primary mt-4" onclick="openProjectForm()">Create project</button></div>`;return}grid.innerHTML=active.map(p=>{const req=p.requiredParts.reduce((s,r)=>s+r.needed,0),done=p.todos.filter(t=>t.done).length,progress=p.todos.length?Math.round(done/p.todos.length*100):0,short=p.requiredParts.reduce((s,r)=>{const it=inventory.find(i=>i.id===r.partId);return s+(!it?1:it.qty<r.needed?1:0)},0);return `<article class="panel rounded-2xl p-5 flex flex-col gap-4"><div class="flex items-start justify-between gap-3"><div class="min-w-0"><h3 class="font-bold text-lg break-words">${esc(p.title)}</h3><p class="text-xs muted mt-2 line-clamp-3">${esc(p.desc||'No project description.')}</p></div><span class="badge">${esc(p.status)}</span></div><div class="flex flex-wrap gap-2"><span class="badge"><i class="fa-solid fa-microchip"></i> ${p.requiredParts.length} part types</span><span class="badge"><i class="fa-solid fa-list-check"></i> ${done}/${p.todos.length} tasks</span>${short?`<span class="badge text-amber-300">${short} requirement gap${short===1?'':'s'}</span>`:''}</div><div><div class="flex justify-between text-xs muted mb-1"><span>Checklist progress</span><span>${progress}%</span></div><div class="h-2 bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-blue-500 rounded-full" style="width:${progress}%"></div></div></div><button class="btn primary w-full mt-auto" onclick="openWorkspace('${esc(p.id)}')">Open workspace <i class="fa-solid fa-arrow-right"></i></button></article>`}).join('')}
+function openWorkspace(id){const p=projects.find(x=>x.id===id);if(!p)return;activeProjectId=id;document.getElementById('projectWorkspace').classList.remove('hide');document.getElementById('workspaceTitle').textContent=p.title;document.getElementById('workspaceDesc').textContent=p.desc;document.getElementById('workspaceStatus').innerHTML=`<span class="badge">${esc(p.status)}</span>`;document.getElementById('aiChat').innerHTML='<p class="muted text-xs">Ask a project-aware question. Previous messages remain visible until you leave this workspace.</p>';aiHistory=[];renderWorkspace();document.getElementById('projectWorkspace').scrollIntoView({behavior:'smooth',block:'start'})}
+function renderWorkspace(){const p=projects.find(x=>x.id===activeProjectId);if(!p)return;document.getElementById('requiredParts').innerHTML=p.requiredParts.length?p.requiredParts.map(r=>{const i=inventory.find(x=>x.id===r.partId);if(!i)return `<div class="rounded-xl border border-red-500/30 bg-red-950/20 p-3"><p class="text-red-300 text-xs">Missing inventory record for requirement (${esc(r.partId)}).</p><button class="text-xs underline mt-2" onclick="removeRequirement('${esc(p.id)}','${esc(r.partId)}')">Remove broken link</button></div>`;const enough=i.qty>=r.needed;return `<div class="rounded-xl border ${enough?'border-slate-800':'border-amber-500/40 bg-amber-950/10'} p-3 flex gap-3"><img class="w-14 h-14 rounded-lg object-cover bg-slate-950" src="${esc(safeImage(i.image)||fallbackImage())}" alt="" onerror="this.onerror=null;this.src='${fallbackImage()}'"><div class="min-w-0 flex-1"><p class="font-semibold leading-snug">${esc(i.title)}</p><p class="text-xs text-blue-300 font-mono mt-1">${esc(i.label)}</p><p class="text-xs ${enough?'text-emerald-300':'text-amber-300'} mt-2">Need ${r.needed} · Owned ${i.qty} · ${enough?'Quantity currently sufficient':`Short ${r.needed-i.qty}`}</p><p class="text-[10px] muted mt-1">Planned requirement only; not reserved stock.</p><div class="flex gap-3 mt-2"><button class="text-xs text-blue-300" onclick="editRequirement('${esc(p.id)}','${esc(i.id)}')">Edit qty</button><button class="text-xs text-red-300" onclick="removeRequirement('${esc(p.id)}','${esc(i.id)}')">Remove</button></div></div></div>`}).join(''):'<div class="rounded-xl border border-dashed border-slate-700 p-5 text-center muted text-xs">No parts linked yet. Add a requirement to check availability.</div>';
+ document.getElementById('todoList').innerHTML=p.todos.length?p.todos.map(t=>`<div class="flex gap-2 items-start rounded-xl bg-slate-950/50 border border-slate-800 p-3"><input type="checkbox" class="mt-1 accent-blue-500" ${t.done?'checked':''} onchange="toggleTask('${esc(p.id)}','${esc(t.id)}',this.checked)" aria-label="Complete ${esc(t.text)}"><span class="flex-1 text-xs ${t.done?'line-through muted':'text-slate-200'}">${esc(t.text)}</span><button class="text-slate-500 hover:text-red-300" onclick="deleteTask('${esc(p.id)}','${esc(t.id)}')" aria-label="Delete task"><i class="fa-solid fa-xmark"></i></button></div>`).join(''):'<div class="rounded-xl border border-dashed border-slate-700 p-5 text-center muted text-xs">No tasks yet. Add the next build step.</div>'}
+function closeWorkspace(){activeProjectId=null;document.getElementById('projectWorkspace').classList.add('hide');renderProjects()}
+function showModal(title,body,footer=''){const root=document.getElementById('modalRoot');root.classList.remove('hide');root.innerHTML=`<div class="modal-backdrop" role="presentation" onclick="if(event.target===this)closeModal()"><section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><header class="flex items-center justify-between gap-3 p-4 border-b border-slate-800"><h2 id="modalTitle" class="font-bold text-base">${esc(title)}</h2><button class="btn secondary !p-2" onclick="closeModal()" aria-label="Close dialog"><i class="fa-solid fa-xmark"></i></button></header><div class="p-4 md:p-5 space-y-4">${body}</div>${footer?`<footer class="p-4 border-t border-slate-800 flex flex-wrap justify-end gap-2">${footer}</footer>`:''}</section></div>`;const first=root.querySelector('input,select,textarea,button');if(first)first.focus()}
+function closeModal(resolvePending=true){stopCamera();if(resolvePending&&typeof window.__oclResolve==='function'){const r=window.__oclResolve;window.__oclResolve=null;r(false)}document.getElementById('modalRoot').classList.add('hide');document.getElementById('modalRoot').innerHTML=''}function resolveDialog(value){const r=window.__oclResolve;window.__oclResolve=null;closeModal(false);if(typeof r==='function')r(value)}
+function field(label,id,value='',type='text',opts={}){return `<label class="block space-y-1.5"><span class="text-xs font-medium text-slate-300">${esc(label)}${opts.required?' <span class="text-red-300">*</span>':''}</span>${opts.select?`<select id="${id}" class="field">${opts.select.map(x=>`<option ${x===value?'selected':''}>${esc(x)}</option>`).join('')}</select>`:type==='textarea'?`<textarea id="${id}" rows="3" class="field" placeholder="${esc(opts.placeholder||'')}">${esc(value)}</textarea>`:`<input id="${id}" class="field" type="${type}" value="${esc(value)}" placeholder="${esc(opts.placeholder||'')}" ${opts.min!==undefined?`min="${opts.min}"`:''} ${opts.step?`step="${opts.step}"`:''} ${opts.required?'required':''}>`}</label>`}
+function openComponentForm(id=null){const item=id?inventory.find(i=>i.id===id):null;if(id&&!item)return;const body=`<form id="componentForm" class="space-y-4" onsubmit="saveComponentForm(event,'${id?esc(id):''}')"><div class="grid sm:grid-cols-2 gap-3">${field('Component name','cfTitle',item?.title||'','text',{required:true})}${field('Part number / label','cfLabel',item?.label||'')}${field('Category','cfCategory',item?.category||'Other','text',{select:['Power','Microcontrollers','Passive','Sensors','Discrete','Modules','Connectors','Tools','Other']})}${field('Manufacturer','cfManufacturer',item?.manufacturer||'')}${field('Quantity owned','cfQty',item?.qty??1,'number',{required:true,min:0,step:'1'})}${field('Minimum stock threshold','cfMinQty',item?.minQty??2,'number',{min:0,step:'1'})}${field('Minimum voltage','cfMinV',item?.minVolt||'')}${field('Maximum voltage','cfMaxV',item?.maxVolt||'')}${field('Storage location','cfLocation',item?.location||'')}${field('Datasheet URL','cfUrl',item?.partUrl||'','url')}</div>${field('Description','cfDesc',item?.desc||'','textarea')}${field('Image URL (optional)','cfImage',item?.image&&!item.image.startsWith('data:')?item.image:'','url',{placeholder:'https://…'})}${field('Notes','cfNotes',item?.notes||'','textarea')}<p id="cfError" class="text-xs text-red-300" role="alert"></p></form>`;showModal(item?'Edit component':'Add component',body,`<button class="btn secondary" onclick="closeModal()">Cancel</button><button class="btn primary" type="submit" form="componentForm"><i class="fa-solid fa-floppy-disk"></i> ${item?'Save changes':'Add component'}</button>`)}
+function saveComponentForm(e,id){e.preventDefault();const v=k=>document.getElementById(k).value.trim(),title=v('cfTitle'),qty=Number(v('cfQty')),minQty=Number(v('cfMinQty'));const err=document.getElementById('cfError');if(!title){err.textContent='Component name is required.';return}if(!Number.isInteger(qty)||qty<0||!Number.isInteger(minQty)||minQty<0){err.textContent='Quantity and minimum threshold must be whole numbers of zero or more.';return}const label=v('cfLabel');if(label&&inventory.some(i=>i.id!==id&&i.label.toLowerCase()===label.toLowerCase())){err.textContent='Another inventory record uses this part number. Check for a duplicate before saving.';return}const data={title,label,category:v('cfCategory'),manufacturer:v('cfManufacturer'),qty,minQty,minVolt:v('cfMinV'),maxVolt:v('cfMaxV'),location:v('cfLocation'),partUrl:v('cfUrl'),desc:v('cfDesc'),image:v('cfImage')|| (id?inventory.find(i=>i.id===id)?.image:'')||'',notes:v('cfNotes')};if(id){const i=inventory.find(x=>x.id===id);Object.assign(i,data)}else inventory.unshift({id:uid('item'),...data});closeModal();commit();toast(id?'Component updated.':'Component added.','success')}
+function showDetails(id){const i=inventory.find(x=>x.id===id);if(!i)return;const d=demandFor(i.id),projectsUsing=projects.filter(p=>p.requiredParts.some(r=>r.partId===i.id));showModal('Component details',`<div class="grid sm:grid-cols-[180px_1fr] gap-4"><img class="w-full h-40 rounded-xl object-cover bg-slate-950" src="${esc(safeImage(i.image)||fallbackImage())}" alt="${esc(i.title)}" onerror="this.onerror=null;this.src='${fallbackImage()}'"><div><span class="badge">${esc(i.category)}</span><h3 class="text-xl font-bold mt-2">${esc(i.title)}</h3><p class="font-mono text-blue-300 mt-1">${esc(i.label||'No part number')}</p><p class="text-sm muted mt-3">${esc(i.desc||'No description recorded.')}</p></div></div><div class="grid grid-cols-2 sm:grid-cols-4 gap-2">${[['Owned',i.qty],['Planned demand',d],['After planned demand',i.qty-d],['Minimum stock',i.minQty]].map(([a,b])=>`<div class="rounded-xl bg-slate-950/60 border border-slate-800 p-3"><p class="text-[10px] uppercase muted">${a}</p><p class="text-lg font-bold mt-1">${b}</p></div>`).join('')}</div><div class="grid sm:grid-cols-2 gap-3 text-xs"><div class="rounded-xl border border-slate-800 p-3"><p class="muted">Voltage range</p><p class="mt-1">${esc(i.minVolt||'Not specified')} – ${esc(i.maxVolt||'Not specified')}</p><p class="muted mt-3">Manufacturer</p><p class="mt-1">${esc(i.manufacturer||'Not specified')}</p></div><div class="rounded-xl border border-slate-800 p-3"><p class="muted">Storage location</p><p class="mt-1">${esc(i.location||'Not specified')}</p><p class="muted mt-3">Datasheet</p><p class="mt-1">${safeHttpUrl(i.partUrl)?`<a class="text-blue-300 underline break-all" href="${esc(safeHttpUrl(i.partUrl))}" target="_blank" rel="noopener noreferrer">Open datasheet/reference</a>`:'Not attached'}</p></div></div><div><p class="font-semibold mb-2">Projects using this component</p>${projectsUsing.length?projectsUsing.map(p=>`<span class="badge mr-1 mb-1">${esc(p.title)}</span>`).join(''):'<p class="text-xs muted">Not linked to any project.</p>'}</div>${i.notes?`<div><p class="font-semibold mb-1">Notes</p><p class="text-xs muted whitespace-pre-wrap">${esc(i.notes)}</p></div>`:''}`,`<button class="btn secondary" onclick="closeModal()">Close</button><button class="btn secondary" onclick="closeModal();adjustQty('${esc(i.id)}',0)">Adjust stock</button><button class="btn primary" onclick="closeModal();openComponentForm('${esc(i.id)}')"><i class="fa-solid fa-pen"></i> Edit component</button>`)}
+function adjustQty(id,delta){const i=inventory.find(x=>x.id===id);if(!i)return;showModal('Adjust stock',`<p class="text-sm muted">${esc(i.title)} · Current quantity: <strong class="text-white">${i.qty}</strong></p><form id="adjustForm" onsubmit="saveAdjustment(event,'${esc(id)}')" class="space-y-3">${field('New total quantity','adjustNewQty',i.qty,'number',{required:true,min:0,step:'1'})}${field('Reason','adjustReason','Manual count correction','text',{select:['Manual count correction','Restock / purchase','Damaged or lost','Return to inventory','Other']})}${field('Notes (optional)','adjustNotes','','textarea')}<p id="adjustError" class="text-xs text-red-300"></p></form>`,`<button class="btn secondary" onclick="closeModal()">Cancel</button><button class="btn primary" type="submit" form="adjustForm">Save quantity</button>`)}
+function saveAdjustment(e,id){e.preventDefault();const i=inventory.find(x=>x.id===id);const qty=Number(document.getElementById('adjustNewQty').value);if(!Number.isInteger(qty)||qty<0){document.getElementById('adjustError').textContent='Enter a whole quantity of zero or more.';return}const demand=demandFor(id);if(qty<demand){document.getElementById('adjustError').textContent=`Warning: projects currently request ${demand} units. This change leaves a planned shortage of ${demand-qty}.`;if(!window.confirm('Save this quantity even though it is below planned project demand?'))return}i.qty=qty;closeModal();commit();toast('Stock quantity updated.','success')}
+async function deleteComponent(id){const i=inventory.find(x=>x.id===id);if(!i)return;const uses=projects.filter(p=>p.requiredParts.some(r=>r.partId===id));const archive=await askChoice(`“${i.title}” ${uses.length?`is linked to ${uses.length} project(s). Removing it will also remove those project links.`:'will be removed from the inventory.'} This action cannot be undone unless you restore a backup.`, 'Remove component', ['Cancel','Remove anyway']);if(archive!=='Remove anyway')return;projects.forEach(p=>p.requiredParts=p.requiredParts.filter(r=>r.partId!==id));inventory=inventory.filter(x=>x.id!==id);commit();toast('Component removed and project links cleaned up.','success')}
+function openProjectForm(id=null){const p=id?projects.find(x=>x.id===id):null;showModal(p?'Edit project':'Create project',`<form id="projectForm" onsubmit="saveProjectForm(event,'${id?esc(id):''}')" class="space-y-3">${field('Project title','pfTitle',p?.title||'','text',{required:true})}${field('Description','pfDesc',p?.desc||'','textarea')}${field('Status','pfStatus',p?.status||'Planning','text',{select:['Planning','Ready to build','In progress','Paused','Completed']})}<p id="pfError" class="text-xs text-red-300"></p></form>`,`<button class="btn secondary" onclick="closeModal()">Cancel</button><button class="btn primary" type="submit" form="projectForm">${p?'Save project':'Create project'}</button>`)}
+function saveProjectForm(e,id){e.preventDefault();const title=document.getElementById('pfTitle').value.trim();if(!title){document.getElementById('pfError').textContent='Project title is required.';return}const data={title,desc:document.getElementById('pfDesc').value.trim(),status:document.getElementById('pfStatus').value};if(id)Object.assign(projects.find(p=>p.id===id),data);else projects.unshift({id:uid('project'),...data,requiredParts:[],todos:[]});closeModal();commit();if(id&&activeProjectId===id)openWorkspace(id);toast(id?'Project updated.':'Project created.','success')}
+function openRequirementForm(partId=''){if(!activeProjectId)return;if(!inventory.length){toast('Add a component to inventory before linking a requirement.');openComponentForm();return}const p=projects.find(x=>x.id===activeProjectId);const options=inventory.map(i=>`${i.id}|||${i.title} (${i.label||'no part number'}) · owned ${i.qty}`).map(x=>x);const body=`<form id="reqForm" onsubmit="saveRequirement(event)" class="space-y-3"><label class="block space-y-1.5"><span class="text-xs text-slate-300">Inventory component</span><select id="rfPart" class="field">${inventory.map(i=>`<option value="${esc(i.id)}" ${i.id===partId?'selected':''}>${esc(i.title)} (${esc(i.label||'no part number')}) · owned ${i.qty}</option>`).join('')}</select></label>${field('Required quantity','rfQty',1,'number',{required:true,min:1,step:'1'})}<p id="rfAvailability" class="text-xs muted"></p><p id="rfError" class="text-xs text-red-300"></p></form>`;showModal('Link component requirement',body,`<button class="btn secondary" onclick="closeModal()">Cancel</button><button class="btn primary" type="submit" form="reqForm">Save requirement</button>`);const upd=()=>{const i=inventory.find(x=>x.id===document.getElementById('rfPart').value),n=Number(document.getElementById('rfQty').value)||1,existing=p.requiredParts.find(r=>r.partId===i?.id),other=p.requiredParts.filter(r=>r.partId!==i?.id).reduce((s,r)=>s+r.needed,0),total=other+(existing?existing.needed:0)+n;document.getElementById('rfAvailability').textContent=i?`Owned: ${i.qty}. Other project demand: ${other}. This project’s existing requirement: ${existing?.needed||0}. Saving replaces this project's requirement quantity. Planned demand across projects after save: ${total}.` :''};document.getElementById('rfPart').addEventListener('change',upd);document.getElementById('rfQty').addEventListener('input',upd);upd()}
+function saveRequirement(e){e.preventDefault();const p=projects.find(x=>x.id===activeProjectId),partId=document.getElementById('rfPart').value,needed=Number(document.getElementById('rfQty').value);if(!p||!inventory.some(i=>i.id===partId))return;if(!Number.isInteger(needed)||needed<1){document.getElementById('rfError').textContent='Required quantity must be a positive whole number.';return}const old=p.requiredParts.find(r=>r.partId===partId);if(old)old.needed=needed;else p.requiredParts.push({partId,needed});closeModal();commit();openWorkspace(p.id);toast('Project requirement saved.','success')}
+function editRequirement(projectId,partId){const p=projects.find(x=>x.id===projectId),r=p?.requiredParts.find(x=>x.partId===partId);if(!r)return;openRequirementForm(partId);document.getElementById('rfQty').value=r.needed}
+async function removeRequirement(projectId,partId){const ok=await askConfirm('Remove this component requirement from the project? Physical stock will not change.','Remove requirement');if(!ok)return;const p=projects.find(x=>x.id===projectId);if(!p)return;p.requiredParts=p.requiredParts.filter(r=>r.partId!==partId);commit();if(activeProjectId===projectId)renderWorkspace()}
+function openTaskForm(){if(!activeProjectId)return;showModal('Add build task',`<form id="taskForm" onsubmit="saveTask(event)" class="space-y-3">${field('Task description','taskText','','text',{required:true,placeholder:'e.g. Verify 3.3 V rail before connecting the board'})}<p id="taskError" class="text-xs text-red-300"></p></form>`,`<button class="btn secondary" onclick="closeModal()">Cancel</button><button class="btn primary" type="submit" form="taskForm">Add task</button>`)}
+function saveTask(e){e.preventDefault();const text=document.getElementById('taskText').value.trim();if(!text){document.getElementById('taskError').textContent='Task description is required.';return}const p=projects.find(x=>x.id===activeProjectId);p.todos.push({id:uid('task'),text,done:false});closeModal();commit();renderWorkspace()}
+function toggleTask(pid,tid,done){const p=projects.find(x=>x.id===pid),t=p?.todos.find(x=>x.id===tid);if(t){t.done=done;commit();renderWorkspace()}}
+async function deleteTask(pid,tid){if(!(await askConfirm('Delete this checklist task?','Delete task')))return;const p=projects.find(x=>x.id===pid);if(p){p.todos=p.todos.filter(t=>t.id!==tid);commit();renderWorkspace()}}
+function setProjectStatus(status){const p=projects.find(x=>x.id===activeProjectId);if(!p)return;p.status=status;commit();openWorkspace(p.id);toast(`Project status changed to ${status}.`,'success')}
+async function archiveActiveProject(){const p=projects.find(x=>x.id===activeProjectId);if(!p)return;if(!(await askConfirm(`Archive “${p.title}”? Its requirements and tasks will be retained.`, 'Archive project')))return;p.status='Archived';commit();closeWorkspace();toast('Project archived.','success')}
+async function deleteProject(id){const p=projects.find(x=>x.id===id);if(!p)return;const answer=await askChoice(`Delete “${p.title}” and its checklist? Inventory quantities will not change.`, 'Delete project', ['Cancel','Archive instead','Delete permanently']);if(answer==='Archive instead'){p.status='Archived';commit();if(activeProjectId===id)closeWorkspace();return}if(answer!=='Delete permanently')return;projects=projects.filter(x=>x.id!==id);if(activeProjectId===id)closeWorkspace();commit();toast('Project deleted.','success')}
+function openScanner(){currentImages=[];showModal('AI Lens · Component scanner',`<div class="space-y-4"><div id="scannerPreview" class="scanner-frame rounded-xl border border-slate-700 bg-slate-950 aspect-video flex items-center justify-center"><video id="cameraVideo" autoplay playsinline class="hidden w-full h-full object-contain"></video><canvas id="captureCanvas" class="hidden"></canvas><div id="cameraEmpty" class="text-center p-6"><i class="fa-solid fa-camera text-4xl text-slate-600"></i><p class="font-semibold mt-3">Capture or upload a component</p><p class="text-xs muted mt-1">Use good lighting and include any visible part markings.</p></div></div><div class="flex flex-wrap gap-2"><button class="btn secondary" onclick="startCamera()"><i class="fa-solid fa-video"></i> Start camera</button><button class="btn primary" onclick="capturePhoto()"><i class="fa-solid fa-camera"></i> Capture</button><label class="btn secondary cursor-pointer"><i class="fa-solid fa-upload"></i> Upload image<input class="hide" type="file" accept="image/*" multiple onchange="handleUploads(event)"></label></div><div id="imageQueue" class="flex gap-2 overflow-x-auto"></div><div id="scanStatus" class="text-xs muted" aria-live="polite">AI identification is optional. You can also enter the component manually below.</div><button id="analyzeBtn" class="btn secondary w-full" onclick="analyzeImages()"><i class="fa-solid fa-wand-magic-sparkles"></i> Identify with Gemini</button><div class="border-t border-slate-800 pt-4"><h3 class="font-semibold mb-3">Review / enter component details</h3><form id="scanForm" onsubmit="saveScannedComponent(event)" class="grid sm:grid-cols-2 gap-3">${field('Component name','scTitle','','text',{required:true})}${field('Part number / label','scLabel')}${field('Category','scCategory','Other','text',{select:['Power','Microcontrollers','Passive','Sensors','Discrete','Modules','Connectors','Tools','Other']})}${field('Quantity owned','scQty',1,'number',{required:true,min:0,step:'1'})}${field('Minimum stock','scMinQty',2,'number',{min:0,step:'1'})}${field('Minimum voltage','scMinV')}${field('Maximum voltage','scMaxV')}${field('Manufacturer','scManufacturer')}${field('Storage location','scLocation')}<div class="sm:col-span-2">${field('Description','scDesc','','textarea')}</div><p id="scanError" class="text-xs text-red-300 sm:col-span-2" role="alert"></p></form></div></div>`,`<button class="btn secondary" onclick="closeScanner()">Cancel</button><button class="btn primary" type="submit" form="scanForm"><i class="fa-solid fa-floppy-disk"></i> Save component</button>`)}
+function closeScanner(){stopCamera();currentImages=[];closeModal()}
+async function startCamera(){if(!navigator.mediaDevices?.getUserMedia){setScanStatus('This browser or context does not support camera access. Upload an image instead.');return}try{mediaStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});const v=document.getElementById('cameraVideo');v.srcObject=mediaStream;v.classList.remove('hidden');document.getElementById('cameraEmpty').classList.add('hidden');setScanStatus('Camera ready. Position the component in good light.')}catch(e){setScanStatus(`Camera unavailable: ${e.message||'permission denied'}. Upload an image or enter details manually.`,'error')}}
+function stopCamera(){if(mediaStream){mediaStream.getTracks().forEach(t=>t.stop());mediaStream=null}const v=document.getElementById('cameraVideo');if(v){v.pause();v.srcObject=null;v.classList.add('hidden')}const empty=document.getElementById('cameraEmpty');if(empty)empty.classList.remove('hidden')}
+function capturePhoto(){const v=document.getElementById('cameraVideo');if(!mediaStream||!v?.videoWidth){setScanStatus('Start the camera and wait for the preview before capturing.','error');return}const c=document.getElementById('captureCanvas');c.width=v.videoWidth;c.height=v.videoHeight;c.getContext('2d').drawImage(v,0,0);const data=c.toDataURL('image/jpeg',.88);currentImages.push(data);renderImageQueue();setScanStatus('Photo captured. You can identify it or complete the form manually.')}
+function handleUploads(e){const files=Array.from(e.target.files||[]);for(const f of files){if(!f.type.startsWith('image/')){setScanStatus(`${f.name} is not an image and was skipped.`,'error');continue}if(f.size>8*1024*1024){setScanStatus(`${f.name} is larger than 8 MB and was skipped.`,'error');continue}if(currentImages.length>=5){setScanStatus('Maximum of five images per scan. Remove one before adding another.','error');continue}const reader=new FileReader();reader.onload=async ev=>{if(typeof ev.target.result==='string'){try{const compressed=await compressImage(ev.target.result);currentImages.push(compressed);renderImageQueue();setScanStatus('Image added. Images are resized before storage to reduce browser storage usage.')}catch{setScanStatus(`Could not process ${f.name}.`,'error')}}};reader.onerror=()=>setScanStatus(`Could not read ${f.name}.`,'error');reader.readAsDataURL(f)}e.target.value=''}
+function compressImage(dataUrl){return new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>{try{const max=1280,scale=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(img.naturalWidth*scale));c.height=Math.max(1,Math.round(img.naturalHeight*scale));c.getContext('2d').drawImage(img,0,0,c.width,c.height);resolve(c.toDataURL('image/jpeg',.82))}catch(e){reject(e)}};img.onerror=reject;img.src=dataUrl})}
+function renderImageQueue(){const q=document.getElementById('imageQueue');if(!q)return;q.innerHTML=currentImages.map((img,idx)=>`<div class="relative shrink-0 w-20 h-20 rounded-lg overflow-hidden border border-slate-700"><img class="w-full h-full object-cover" src="${esc(img)}" alt="Selected image ${idx+1}"><button class="absolute top-1 right-1 w-6 h-6 rounded-full bg-red-700 text-white" onclick="removeImage(${idx})" aria-label="Remove image ${idx+1}">×</button></div>`).join('')}
+function removeImage(idx){currentImages.splice(idx,1);renderImageQueue();setScanStatus(currentImages.length?'Image removed.':'No image selected. Manual entry is still available.')}
+function setScanStatus(msg,type='info'){const el=document.getElementById('scanStatus');if(el){el.textContent=msg;el.className='text-xs '+(type==='error'?'text-red-300':type==='success'?'text-emerald-300':'muted')}}
+async function analyzeImages(){if(!currentImages.length){setScanStatus('Capture or upload an image first.','error');return}if(!geminiKey){setScanStatus('Configure and unlock a Gemini API key in Settings, or enter details manually.','error');return}const btn=document.getElementById('analyzeBtn');btn.disabled=true;btn.innerHTML='<i class="fa-solid fa-rotate fa-spin"></i> Analyzing image…';setScanStatus('Preparing image for AI identification…');try{const [header,b64]=currentImages[0].split(',');const mime=(header.match(/data:(.*?);base64/)||[])[1]||'image/jpeg';const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(geminiKey)}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:'Identify the electronic component in the attached image. Do not guess uncertain technical specifications. Return JSON only with keys title, label, category, minVolt, maxVolt, desc, manufacturer. Allowed category values: Power, Microcontrollers, Passive, Sensors, Discrete, Modules, Connectors, Tools, Other. If a value is unknown use an empty string. minVolt and maxVolt should include units if known. State uncertainty in desc.'},{inline_data:{mime_type:mime,data:b64}}]}],generationConfig:{responseMimeType:'application/json',temperature:0.2}})});const data=await res.json();if(!res.ok)throw new Error(data.error?.message||`Gemini request failed (HTTP ${res.status}).`);const text=data.candidates?.[0]?.content?.parts?.map(p=>p.text||'').join('');if(!text)throw new Error(data.promptFeedback?.blockReason||'The AI returned no usable identification.');const parsed=JSON.parse(text.replace(/^```json\s*/i,'').replace(/```$/,'').trim());document.getElementById('scTitle').value=parsed.title||'';document.getElementById('scLabel').value=parsed.label||'';document.getElementById('scCategory').value=['Power','Microcontrollers','Passive','Sensors','Discrete','Modules','Connectors','Tools','Other'].includes(parsed.category)?parsed.category:'Other';document.getElementById('scMinV').value=parsed.minVolt||'';document.getElementById('scMaxV').value=parsed.maxVolt||'';document.getElementById('scDesc').value=parsed.desc||'';document.getElementById('scManufacturer').value=parsed.manufacturer||'';setScanStatus('Identification returned. Verify every field against markings or a datasheet before saving.','success')}catch(e){setScanStatus(`Identification failed: ${e.message}. Your image and manual form are still available.`,'error')}finally{btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-wand-magic-sparkles"></i> Identify with Gemini'}}
+function saveScannedComponent(e){e.preventDefault();const val=id=>document.getElementById(id).value.trim(),title=val('scTitle'),qty=Number(val('scQty')),minQty=Number(val('scMinQty'));if(!title){document.getElementById('scanError').textContent='Component name is required.';return}if(!Number.isInteger(qty)||qty<0||!Number.isInteger(minQty)||minQty<0){document.getElementById('scanError').textContent='Quantity fields must be whole numbers of zero or more.';return}const label=val('scLabel');if(label&&inventory.some(i=>i.label.toLowerCase()===label.toLowerCase())){document.getElementById('scanError').textContent='A component with this part number already exists. Check inventory before adding a duplicate.';return}inventory.unshift({id:uid('item'),title,label,category:val('scCategory'),qty,minQty,minVolt:val('scMinV'),maxVolt:val('scMaxV'),manufacturer:val('scManufacturer'),location:val('scLocation'),desc:val('scDesc'),image:currentImages[0]||'',partUrl:'',notes:''});stopCamera();closeModal();commit();toast('Component saved.','success')}
+function hashPin(pin){return CryptoJS.SHA256(pin).toString()}function encryptData(data,pin){return CryptoJS.AES.encrypt(data,pin).toString()}function decryptData(cipher,pin){try{return CryptoJS.AES.decrypt(cipher,pin).toString(CryptoJS.enc.Utf8)}catch{return ''}}
+function unlockSettings(){const stored=localStorage.getItem(KEYS.pinHash);if(!stored){showModal('Set security PIN',`<p class="text-sm muted">The PIN gates access to settings in this browser; it is not an account login and does not encrypt your inventory.</p><form id="pinSetup" onsubmit="setupPin(event)" class="space-y-3">${field('Create a PIN (at least 6 characters recommended)','pinNew','','password',{required:true})}${field('Confirm PIN','pinConfirm','','password',{required:true})}<p id="pinError" class="text-xs text-red-300"></p></form>`,`<button class="btn secondary" onclick="closeModal()">Cancel</button><button class="btn primary" type="submit" form="pinSetup">Set PIN</button>`);return}showModal('Unlock settings',`<form id="pinUnlock" onsubmit="checkPin(event)" class="space-y-3"><p class="text-sm muted">Enter your browser PIN to open settings.</p>${field('Security PIN','pinUnlockValue','','password',{required:true})}<p id="pinError" class="text-xs text-red-300"></p></form>`,`<button class="btn secondary" onclick="closeModal()">Cancel</button><button class="btn primary" type="submit" form="pinUnlock">Unlock</button>`)}
+function setupPin(e){e.preventDefault();const a=document.getElementById('pinNew').value,b=document.getElementById('pinConfirm').value;if(a.length<6){document.getElementById('pinError').textContent='Use at least 6 characters. A longer passphrase is stronger.';return}if(a!==b){document.getElementById('pinError').textContent='PIN values do not match.';return}activePin=a;localStorage.setItem(KEYS.pinHash,hashPin(a));closeModal();openSettings();toast('Browser settings PIN configured.','success')}
+function checkPin(e){e.preventDefault();const pin=document.getElementById('pinUnlockValue').value;if(hashPin(pin)!==localStorage.getItem(KEYS.pinHash)){document.getElementById('pinError').textContent='Incorrect PIN.';return}activePin=pin;geminiKey=decryptData(localStorage.getItem(KEYS.encGemini)||'',pin);closeModal();openSettings()}
+function openSettings(){showModal('Settings, AI & synchronization',`<div class="rounded-xl border border-amber-500/30 bg-amber-950/20 p-3 text-xs text-amber-100"><strong>Security note:</strong> this is a browser-only app. A PIN and client-side encryption do not make browser storage a secure vault; the JSONBin master key is stored in localStorage for compatibility. Do not use this setup for sensitive credentials on a shared or untrusted device.</div><form id="settingsForm" onsubmit="saveSettingsForm(event)" class="space-y-4">${field('Gemini API key','setGemini',geminiKey,'password',{placeholder:'Leave blank to disable AI'})}<p class="text-xs muted">AI Studio: <a class="text-blue-300 underline" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Manage API keys</a>. Your key is used directly by this browser to call Gemini.</p><div class="grid sm:grid-cols-2 gap-3">${field('JSONBin Bin ID','setBinId',binId)}${field('JSONBin master key','setBinMaster',binMaster,'password')}</div><p class="text-xs muted">Cloud sync sends your inventory and projects to JSONBin. This is third-party cloud storage, not a self-hosted backend. <a class="text-blue-300 underline" href="https://jsonbin.io/" target="_blank" rel="noopener noreferrer">Get a JSONBin API key</a>.</p>${field('Default low-stock threshold','setLow',localStorage.getItem(KEYS.lowThreshold)||2,'number',{min:0,step:'1'})}<p id="settingsError" class="text-xs text-red-300"></p></form>`,`<button class="btn secondary" onclick="closeModal()">Cancel</button><button class="btn secondary" onclick="exportData()">Export backup</button><button class="btn secondary" onclick="importData()">Import backup</button><button class="btn primary" type="submit" form="settingsForm">Save settings</button>`)}
+function saveSettingsForm(e){e.preventDefault();const k=document.getElementById('setGemini').value.trim(),id=document.getElementById('setBinId').value.trim(),master=document.getElementById('setBinMaster').value.trim(),threshold=Number(document.getElementById('setLow').value);if(!Number.isInteger(threshold)||threshold<0){document.getElementById('settingsError').textContent='Low-stock threshold must be a whole number of zero or more.';return}geminiKey=k;binId=id;binMaster=master;cloudReady=false;localStorage.setItem(KEYS.encGemini,encryptData(geminiKey,activePin));localStorage.setItem(KEYS.binId,binId);localStorage.setItem(KEYS.binMaster,binMaster);localStorage.setItem(KEYS.lowThreshold,String(threshold));inventory.forEach(i=>{if(!Number.isFinite(i.minQty))i.minQty=threshold});closeModal();commit();if(binId&&binMaster){setSyncState('Local saved · cloud configured');toast('Settings saved. Use Sync to compare or upload data.','success')}else toast('Settings saved locally. Cloud sync is not configured.','success')}
+function askAi(e){e.preventDefault();const prompt=document.getElementById('aiPrompt').value.trim();if(!prompt)return;if(!geminiKey){toast('Unlock Settings and configure a Gemini API key first.');return}const p=projects.find(x=>x.id===activeProjectId);if(!p)return;const chat=document.getElementById('aiChat');appendChat('You',prompt,'user');document.getElementById('aiPrompt').value='';const loading=document.createElement('p');loading.className='text-xs text-purple-300 animate-pulse';loading.textContent='AI Lab Coach is thinking…';chat.appendChild(loading);chat.scrollTop=chat.scrollHeight;const inv=inventory.map(i=>({title:i.title,partNumber:i.label,category:i.category,owned:i.qty,plannedDemand:demandFor(i.id)}));fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(geminiKey)}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:`You are an electronics lab assistant. Provide cautious, practical technical guidance. Do not claim inventory has been reserved or consumed. App-calculated inventory context: ${JSON.stringify(inv)}\nProject: ${p.title}\nDescription: ${p.desc}\nRequirements: ${JSON.stringify(p.requiredParts)}\nUser question: ${prompt}`}]}],generationConfig:{temperature:.35}})}).then(async r=>{const d=await r.json();if(!r.ok)throw new Error(d.error?.message||`HTTP ${r.status}`);const reply=d.candidates?.[0]?.content?.parts?.map(x=>x.text||'').join('\n');if(!reply)throw new Error('No response text was returned.');return reply}).then(reply=>{loading.remove();appendChat('AI Lab Coach',reply,'ai')}).catch(err=>{loading.remove();appendChat('Error',`Could not reach Gemini: ${err.message}`,'error')})}
+function appendChat(who,text,kind){const chat=document.getElementById('aiChat'),box=document.createElement('div');box.className='rounded-xl p-3 text-xs whitespace-pre-wrap break-words '+(kind==='user'?'bg-blue-950/50 border border-blue-900':kind==='error'?'bg-red-950/40 border border-red-900':'bg-purple-950/30 border border-purple-900/70');const title=document.createElement('p');title.className='font-bold mb-1 '+(kind==='user'?'text-blue-300':kind==='error'?'text-red-300':'text-purple-200');title.textContent=who;const content=document.createElement('div');content.textContent=text;box.append(title,content);chat.appendChild(box);chat.scrollTop=chat.scrollHeight}
+function exportData(){const blob=new Blob([JSON.stringify({schemaVersion:2,exportedAt:new Date().toISOString(),items:inventory,projects},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`open-component-lens-backup-${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);toast('Backup export started.','success')}
+function importData(){showModal('Import backup',`<p class="text-sm muted">Choose a JSON backup exported from Open Component Lens. Review it before replacing current data.</p><input id="importFile" class="field" type="file" accept="application/json,.json"><p id="importError" class="text-xs text-red-300"></p>`,`<button class="btn secondary" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="readImport()">Review backup</button>`)}
+function readImport(){const file=document.getElementById('importFile').files[0];if(!file){document.getElementById('importError').textContent='Choose a JSON file first.';return}const reader=new FileReader();reader.onload=()=>{try{const d=JSON.parse(reader.result);if(!Array.isArray(d.items)||!Array.isArray(d.projects))throw new Error('Backup must contain items and projects arrays.');const ni=d.items.map(normalizeItem),np=d.projects.map(normalizeProject);showModal('Confirm backup restore',`<div class="rounded-xl border border-amber-500/30 bg-amber-950/20 p-3 text-sm text-amber-100">This replaces your current inventory and projects. Export your current data first if you may need it.</div><p>Backup contains <strong>${ni.length}</strong> component records and <strong>${np.length}</strong> projects.</p>`,`<button class="btn secondary" onclick="closeModal()">Cancel</button><button class="btn danger" onclick="applyImport()">Replace current data</button>`);window.__pendingImport={items:ni,projects:np}}catch(err){document.getElementById('importError').textContent=err.message}};reader.readAsText(file)}
+function applyImport(){if(!window.__pendingImport)return;inventory=window.__pendingImport.items;projects=window.__pendingImport.projects;delete window.__pendingImport;closeModal();commit();toast('Backup restored.','success')}
+function askConfirm(message,title='Please confirm'){return new Promise(resolve=>{showModal(title,`<p class="text-sm leading-relaxed">${esc(message)}</p>`,`<button class="btn secondary" onclick="resolveDialog(false)">Cancel</button><button class="btn primary" onclick="resolveDialog(true)">Confirm</button>`);window.__oclResolve=resolve})}
+function askChoice(message,title,choices){return new Promise(resolve=>{showModal(title,`<p class="text-sm leading-relaxed">${esc(message)}</p>`,`<button class="btn secondary" onclick="resolveDialog('Cancel')">Cancel</button>${choices.filter(x=>x!=='Cancel').map((x,i)=>`<button class="btn ${x.toLowerCase().includes('delete')||x.toLowerCase().includes('remove')?'danger':'primary'}" onclick="resolveDialog('${esc(x)}')">${esc(x)}</button>`).join('')}`);window.__oclResolve=resolve})}
+window.addEventListener('keydown',e=>{if(e.key==='Escape'&&!document.getElementById('modalRoot').classList.contains('hide')){stopCamera();closeModal()}});
+window.addEventListener('beforeunload',()=>stopCamera());
+// Local-first boot: render immediately; cloud sync is always an explicit user action to avoid silently overwriting local records.
+renderAll();if(binId&&binMaster){setSyncState('Checking cloud…','syncing');setTimeout(()=>syncNow(),350)}
+</script>
+</body></html>
