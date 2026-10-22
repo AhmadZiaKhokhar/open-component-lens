@@ -1,0 +1,195 @@
+Core Concept: Open Component Lens v3.1 Pro
+Open Component Lens is a secure, serverless, single-file hardware lab assistant and electronic component inventory manager designed for engineers, makers, and electronics hobbyists. It bridges physical component storage with digital project tracking and AI-powered datasheet extraction.
+
+1. Secure Client-Side Architecture & Cloud Sync
+Zero-Knowledge Privacy: Uses AES-256 encryption and a master PIN system so sensitive API keys and component inventories remain completely secure in the browser.
+
+Cloud Persistence: Automatically synchronizes inventory and project states directly to a private cloud container via JSONBin.
+
+2. AI Vision Inventory Management (Pillar 1)
+Component Vault: A structured cataloging system that categorizes hardware parts (Microcontrollers, Power Regulators, Passives, Sensors) with real-time stock quantity controls (+ / -).
+
+AI Datasheet Parser: Features a camera scan and image upload pipeline powered by Gemini 1.5 Flash to automatically extract part numbers, voltage thresholds, and descriptions from physical hardware or packaging.
+
+Shortage Detection: Instantly flags components running low on stock or tied up in active builds.
+
+3. Integrated Project Tracker & Playground (Pillar 2)
+Build Binding: Links specific physical components from your inventory vault directly to active hardware projects (e.g., binding an ESP32 and LM317 to an "IoT Weather Station" project).
+
+Lab Workspace: Provides a centralized hub to monitor active builds, manage project requirements, and track what hardware is allocated versus what is available in free stock.
+
+UI Component Specification: Open Component Lens v3.1 Pro
+1. Global Shell & Navigation Header
+Top Bar / Brand Header:
+
+Purpose: Establishes app identity and provides global action controls.
+
+Elements: App title ("Open Component Lens V3.1 PRO") with an electronics microchip icon, subtitle ("Encrypted AI Lab & Inventory Hub"), and status indicators.
+
+Global Action & Status Bar:
+Purpose: Displays live system health and quick triggers.Elements:Cloud Sync Badge ([Cloud Synced] / Connected) with a pulse sync icon.   Primary CTA: [Scan Part] button (triggers the AI camera/image upload modal).   Settings button ([⚙️] / gear icon for PIN and API key configuration).
+2. Dashboard Metrics Bar (Top Summary Cards)Purpose: Gives engineers an instant numerical overview of inventory health and active workloads at a glance without scrolling.UI Elements (3 Cards):Total Parts Card: Displays total component count (e.g., 4 parts) with a chip icon.   Low Stock / Shortage Card: Highlights items running low or flagged for shortages (e.g., 1 shortage) with a warning triangle icon.   Active Builds Card: Tracks ongoing projects linked to inventory (e.g., 1 active build) with a project tracker icon.   3. Primary Navigation TabsPurpose: Switches the main workspace between inventory management and project tracking.UI Elements:[📦 Inventory] tab (Active default view showing component vaults).[🛠️ Projects & Playground] tab (Switches to build tracking and AI assistance).4. Filter & Search ToolbarPurpose: Allows instant querying and categorization of hardware components.UI Elements:Search Input: A full-width search bar with a magnifying glass icon ("Search components, IC numbers, categories...").   Category Filter Pills / Dropdown: Filters parts by hardware class (All Categories, Power / Regulators, Microcontrollers, Passives (Res/Cap/Ind), Sensors & Modules, Discrete Semiconductors).   5. Component Inventory Grid / ListPurpose: The core data-display engine showing individual electronic components.UI Elements (Card Layout per Component):Voltage Badge: A distinct badge showing voltage ranges (e.g., 3.0V - 3.6V, 1.2V - 37V).   Category & Part Number: Secondary category tag and bold part number (e.g., ESP32, LM317T, ATMEGA328P).   Component Title & Description: Clear name and technical summary (e.g., "Dual-core Wi-Fi and Bluetooth microcontroller module").   Status / Warning Badges: Conditional alert tags (e.g., Shortage / Low).   Project Binding Link: Shows which project the part is allocated to, complete with an unbind/delete action icon (🔗 IoT Weather Station [🗑️]).   Stock Stepper Controls: Interactive quantity modifier buttons ([-] decrement, live count like 2 or 29, [+] increment).   
+
+UI Component Specification: Projects & Playground Workspace
+1. Workspace Header & Description
+Purpose: Explains the isolated focus mode and offers the primary action to start a new build.
+
+UI Elements:
+
+Section Title: Lab Projects & Isolated Playground
+
+Subtitle / Description: "Focus on one build at a time with automated stock shortage checks and Gemini AI assistant."
+
+Primary CTA: [+ New Project Build] button.
+
+2. Project Card Component (List / Grid View)
+Purpose: Represents an active engineering project, showing its scope, linked inventory status, and entry point into the isolated assistant.
+
+UI Elements per Project Card:
+
+Project Title: Bold heading (e.g., IoT Weather Station).
+
+Delete / Trash Action: Icon button for removing or archiving the project ([🗑️]).
+
+Project Description: Summary of the build (e.g., "Monitoring temperature, humidity, and barometric pressure via Wi-Fi telemetry.").
+
+Linked Components Badge: Status indicator showing how many parts are bound to the project (e.g., 3 Linked Parts).
+
+Secondary CTA: [Open Playground ➔] button that transitions the user into the isolated AI coaching view for that specific project.
+
+
+UI Component Specification: Inside Project Playground (Active Build View)
+1. Header & Exit Control
+Purpose: Indicates the active project workspace and provides an immediate way back to the master project list.
+
+UI Elements:
+
+Back Action Button: [⬅️ Back to Projects]
+
+Active Project Title: Large, prominent heading (e.g., IoT Weather Station)
+
+Project Description: Subtitle summarizing the build goals (e.g., "Monitoring temperature, humidity, and barometric pressure via Wi-Fi telemetry.")
+
+2. Required Components Panel (Stock & Shortage Engine)
+Purpose: Displays the specific hardware parts bound to this project, comparing required quantities against available vault inventory and highlighting shortages.
+
+UI Elements:
+
+Section Header: REQUIRED COMPONENTS with an action button [+ Link Part]
+
+Component Item Card / Row:
+
+Part Name & Description: (e.g., ESP32-WROOM-32 WiFi/BLE Module, LM317 Adjustable Voltage Regulator, ATmega328P Microcontroller)
+
+Part Number / Category Tag: (e.g., ESP32, LM317T, ATMEGA328P)
+
+Stock Ratio Indicator: Text displaying quantity required vs. available in stock (e.g., Required: 1 | Available: 2)
+
+Warning / Shortage Badge: Conditional alert styling when stock is insufficient (e.g., ⚠️ Shortage! displayed when required exceeds available)
+
+Unbind / Remove Action: Icon button to unlink the part from the project ([❌])
+
+3. Build Checklist Panel
+Purpose: Tracks engineering milestones and assembly tasks for the specific project.
+
+UI Elements:
+
+Section Header: BUILD CHECKLIST with an action button [+ Add Task]
+
+Checklist Task Item:
+
+Checkbox & Text: Interactive checkbox paired with task description (e.g., [x] Solder I2C sensors to bus, [ ] Flash ESP32 firmware)
+
+Delete Task Action: Trash icon button to remove the task ([🗑️])
+
+4. Gemini AI Lab Coach (Integrated Assistant Panel)
+Purpose: Provides contextual, deep engineering assistance (schematic troubleshooting, wiring guidance, IDE/library compatibility, flashing help) tailored directly to the active project and its component stock.
+
+UI Elements:
+
+Section Header / Branding: Robot / AI icon accompanied by Gemini AI Lab Coach
+
+Helper Text: "Ask for schematic troubleshooting, wiring suggestions, or code snippets for this build."
+
+System Status Banner: Active status indicator (e.g., AI Coach ready. Ask a question regarding your component stock or build steps below.)
+
+Interactive Chat Input Bar: Text input field (___Ask AI coach...___) paired with an execution button ([Ask])
+
+
+Based on the live UI and interactive workflow of your Open Component Lens app, here is how the Link Component to a Project feature works step by step:Open the Project Playground: Navigate to the Projects & Playground tab and click on an active project (e.g., IoT Weather Station) to open its isolated workspace.   Trigger the Link Modal: Inside the project view, look at the REQUIRED COMPONENTS section and click the [+ Link Part] button.   Select Component: A modal titled Link Inventory Component appears with a dropdown list of your available hardware parts pulled from your inventory vault (e.g., ESP32-WROOM-32, LM317 Adjustable Voltage Regulator, ATmega328P Microcontroller, or 100nF Ceramic Decoupling Capacitor).   Specify Quantity: Enter the required quantity needed for this specific build in the Required Quantity input field.   Confirm Link: Click the [Link Part] button to bind it. The component will instantly appear under the project's required list, automatically calculating whether you have enough stock or if it triggers a shortage warning against your total inventory count.   
+
+Based on the current live application interface of your Open Component Lens app, here is how the AI Lens Component Scanner (camera snap / image upload) works, along with the complete remaining UI layout breakdown so you have everything documented for Google Stitch:
+
+1. How the AI Lens Component Scanner Works (Camera Snap vs. Gallery Upload)
+The component scanner popup modal handles two distinct methods of ingesting hardware data for Gemini 1.5 Flash to analyze:
+
+Method A: Live Webcam Stream ([📹 Camera] & [🎯 Snap Photo])
+
+Step 1: Clicking the [📹 Camera] button activates the browser's navigator.mediaDevices.getUserMedia API, streaming live video from your device camera into a video element inside the scanner modal.
+
+Step 2: Once you align the physical microchip or component packaging in front of the lens, clicking [🎯 Snap Photo] freezes the video frame and draws it onto an internal HTML canvas.
+
+Step 3: The canvas converts the image frame into a Base64 encoded JPEG data URL.
+
+Method B: Gallery Upload ([📤 Upload])
+
+Step 1: Clicking [📤 Upload] opens your local operating system file explorer.
+
+Step 2: Selecting a local photo of a component reads the file via the JavaScript FileReader API and converts it into a Base64 encoded JPEG buffer.
+
+Step C: AI Extraction Pipeline ([✨ Run Gemini AI Lens])
+
+Step 1: Once the image is captured or uploaded, clicking [✨ Run Gemini AI Lens] packages the Base64 image and a strict extraction prompt and sends it to the Gemini 1.5 Flash API.
+
+Step 2: Gemini parses the IC text, part markings, and physical package type, automatically auto-filling the form fields below (Component Title, Part Number, Category Dropdown, Min/Max Voltage, and Datasheet Summary).
+
+Step 3: Clicking [Save Component] pushes the parsed data directly into your local and cloud-synced inventory vault.
+
+2. Complete Remaining UI Layout Breakdown (Overview of All Views)
+Here is a full structural index of every remaining screen and panel currently present in your app:
+
+A. Settings / Configuration Modal ([⚙️] gear icon in header)
+Purpose: Manages security credentials and cloud connectivity.
+
+UI Elements:
+
+Master PIN Management: Input field to set or verify your SHA-256 Master PIN.
+
+API Key Inputs: Secure input fields for your Gemini API Key and JSONBin API Key/Bin ID.
+
+Encryption Notice: Explains that keys are encrypted client-side using AES-256.
+
+Action Buttons: [Save Settings] / [Close].
+
+B. Inventory Vault View ([📦 Inventory] Tab)
+Purpose: The main dashboard workspace for browsing all electronic components.
+
+UI Elements:
+
+Search Bar & Category Filter: Filters parts by category (Power/Regulators, Microcontrollers, Passives, Sensors, Discrete).
+
+Component Cards Grid: Displays individual component cards featuring voltage badges, stock counts (+/- steppers), shortage warning badges, and project binding links (🔗 [Project Name] [🗑️]).
+
+C. Projects & Playground List View ([🛠️ Projects & Playground] Tab)
+Purpose: Displays all active engineering builds and their overall status.
+
+UI Elements:
+
+Header: Title and description for the isolated playground.
+
+Primary CTA: [+ New Project Build] button (opens a modal to input project name and description).
+
+Project Cards: Card list showing project titles, descriptions, linked component counts, a delete action ([🗑️]), and an [Open Playground ➔] button.
+
+D. Inside Project Playground View (Focus Mode)
+Purpose: Deep-dive workspace for a single active project.
+
+UI Elements:
+
+Back Header: [⬅️ Back to Projects] button.
+
+Required Components Section: Lists bound parts with stock ratios (Required: X | Available: Y) and conditional ⚠️ Shortage! alerts, plus the [+ Link Part] modal trigger.
+
+Build Checklist Section: Interactive task list with checkboxes and a [+ Add Task] button.
+
+Gemini AI Lab Coach Panel: Chat input interface (___Ask AI coach...___ and [Ask]) where the AI provides context-aware troubleshooting based on the project's specific component stock.
