@@ -1482,7 +1482,7 @@
         try {
           const [header, b64] = currentImages[0].split(",");
           const mime = (header.match(/data:(.*?);base64/) || [])[1] || "image/jpeg";
-          const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(geminiKey)}`;
+          const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(geminiKey)}`;
           const promptText =
             "Identify the electronic component in the attached image. Return ONLY a valid raw JSON object (no markdown, no backticks) with keys: title, label, category, minVolt, maxVolt, desc, manufacturer. Allowed category values: Power, Microcontrollers, Passive, Sensors, Discrete, Modules, Connectors, Tools, Other. If a value is unknown use an empty string. minVolt and maxVolt should include units if known.";
           const payload = {
