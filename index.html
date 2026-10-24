@@ -173,11 +173,14 @@
           border-radius: 1rem 1rem 0.6rem 0.6rem;
         }
       }
-      body .nl-wrap{
-         opacity: 0;
-         pointer-events: none;
-         appearance: none;
-         display: inline;        
+       iframe#nl-badge-frame,
+       #nl-badge-frame,
+      #nl-badge-frame *{
+         opacity: 0 !important;
+         pointer-events: none !important;;
+         appearance: none !important;;
+         width:0px !important;
+        height:0px !important
       }
     </style>
   </head>
