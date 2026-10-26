@@ -69,67 +69,7 @@ modify, and distribute this software, including in proprietary or
 closed-source projects, provided the original copyright and license
 notice are retained.
 
----
 
-### ⚠️ Strict Legal Notice & Terms of Use
-
-> **CRITICAL DISCLAIMER:** This repository contains radio frequency (RF)
-> analysis, packet injection, and wireless auditing tools. They are
-> intended **strictly for authorized educational instruction, security
-> research, penetration testing, and isolated laboratory use.**
-
-By accessing, cloning, compiling, or deploying any part of this
-software, you agree to the following:
-
-1. **Mandatory Explicit Authorization** — You must obtain **explicit,
-   written, and verifiable permission** from the system owner, network
-   administrator, and (where applicable) facility management *before*
-   performing any active wireless analysis, scanning, mapping, or
-   security testing on any network or device you do not personally own.
-
-2. **Lawful Use Only** — This software must not be used to target,
-   disrupt, exploit, or intercept communications on networks or
-   infrastructure without prior authorization. Laws governing wireless
-   interception, jamming, deauthentication attacks, and unauthorized
-   access **vary by country** and may include (depending on
-   jurisdiction) computer-misuse laws, wiretap/interception statutes,
-   and radio-frequency regulations enforced by bodies such as the FCC
-   (United States), ETSI/national regulators (EU), Ofcom (UK), or
-   equivalent authorities elsewhere. It is your responsibility to know
-   and follow the laws that apply to you.
-
-3. **Export Control Notice** — Software involving RF/wireless security
-   tooling may be subject to export control or dual-use regulations in
-   some countries (e.g., U.S. EAR, Wassenaar Arrangement-aligned
-   regimes). Users are responsible for complying with any export or
-   import restrictions that apply in their jurisdiction.
-
-4. **User Responsibility** — The authors, developers, and contributors
-   accept **no legal or financial liability** for any misuse, damage, or
-   legal consequences arising from use of this software. The end user
-   assumes full responsibility for their own actions and compliance
-   with applicable law. (Note: some jurisdictions limit how far
-   liability can be disclaimed by law — this notice does not override
-   those protections where they apply.)
-
-5. **"As-Is" Warranty Disclaimer** — This software is provided *"as is"*,
-   without warranty of any kind, express or implied, including but not
-   limited to warranties of merchantability, fitness for a particular
-   purpose, and non-infringement. In no event shall the authors or
-   copyright holders be liable for any claim, damages, or other
-   liability arising from the software or its use.
-
-6. **Contributions** — By submitting a pull request or other
-   contribution, you confirm you have the right to submit the code and
-   agree it will be licensed under the same terms as this project.
-
----
-
-### 🛡️ Ethical Hacking Code of Conduct
-
-- **Respect Privacy** — Never capture, store, or exfiltrate data
-  belonging to uninvolved third parties.
-- **Minimize Disruption** — Perform active testing only inside isolated
   lab environments (e.g., Faraday enclosures) or on systems you are
   explicitly authorized to test.
 - **Responsible Disclosure** — If vulnerabilities are found during
